@@ -30,10 +30,18 @@ struct func
     }
 };
 
+thread create_thread_func()
+{
+    thread t{func()};
+    return t;
+}
+
 void test_thread_class()
 {
     FUNC_HEAD();
-    thread t{func()};
+    thread t;
+    t = create_thread_func();
+
     if (t.joinable())
     {
         t.join();

@@ -118,12 +118,12 @@ bool trace_matched(SE_newTx &se, UPCUL_123 &trace_123, UPCUL_211 &trace_211)
     {
         return false;
     }
-/*   
+    /*   
     if (!(trace_123.srCause == se.srCause && trace_123.isSrReceived == se.isSrReceived && trace_123.srType == se.srType))
     {
         return false;
     }
-*/    
+*/
     return true;
 }
 
