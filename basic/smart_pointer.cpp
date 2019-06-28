@@ -91,6 +91,7 @@ void f(const Foo &)
     cout << "f(const Foo &)" << endl;
 }
 
+//unique_ptr 可以移动，但不能拷贝
 int test_unique_ptr()
 {
     FUNC_HEAD();
