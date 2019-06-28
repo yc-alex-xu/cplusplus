@@ -11,6 +11,7 @@ using namespace std;
 
 int test_future()
 {
+    FUNC_HEAD();
     // 将一个返回值为7 的lambda 表达式封装到task 中
     //  packaged_task 的模板参数为要封装函数的类型
     packaged_task<int()> task([]() { return 7; });

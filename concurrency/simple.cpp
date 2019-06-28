@@ -2,7 +2,7 @@
  */
 
 #include <iostream>
-#include <functional>
+// #include <functional>
 #include <thread>
 #include <mutex>
 #include <cassert>
@@ -11,32 +11,41 @@ using namespace std;
 
 void hello()
 {
-    cout << " hello world " << endl;
+    cout << "Welocme to Concurrent  world!" << endl;
 }
 
 void test_hello()
 {
-
-    FUNC_HEAD();
     thread t{hello};
+    FUNC_HEAD();
+
     t.join();
+
+    thread t2{hello};
+    cout << "orginnal thrad id\t" << t2.get_id() << endl;
+    thread t3{move(t2)};
+    cout << "new thrad id via move\t" << t3.get_id() << endl;
+    t3.join();
 }
 
-struct func
+struct FO //function objec
 {
-    void operator()()
+
+    void operator()(int i)
     {
-        cout << "the method of class was called" << endl;
+        cout << "the param is\t" << i << endl;
     }
 };
 
 thread create_thread_func()
 {
-    thread t{func()};
+    FO f;
+    f(555);
+    thread t{f, 666};
     return t;
 }
 
-void test_thread_class()
+void test_thread_function_object()
 {
     FUNC_HEAD();
     thread t;
@@ -46,7 +55,7 @@ void test_thread_class()
     {
         t.join();
     }
-    thread t2{func()};
+    thread t2{FO(), 777};
     t2.detach();
     assert(!t2.joinable());
 }
@@ -120,7 +129,7 @@ void test_wo_unique_lock() //comparation /contrast to test_unique_lock()
 int main()
 {
     test_hello();
-    test_thread_class();
+    test_thread_function_object();
     test_thread_ref();
 
     test_unique_lock();

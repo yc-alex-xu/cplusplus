@@ -11,20 +11,17 @@ mutex m;
 thread_local int g_n = 1;
 void f()
 {
-    m.lock();
-    g_n++;
+    for (auto i = 0; i < 100000; i++)
+        g_n++;
     cout << __func__ << ":\t" << g_n << endl;
-    m.unlock();
 }
 
-void foo()
+void g()
 {
-    thread_local int i = 0;
-    m.lock();
-    i++;
-    cout << __func__ << ":\t" << g_n << "\t" << i << endl;
-    i++;
-    m.unlock();
+    thread_local int j = 0;
+    for (auto i = 0; i < 100000; i++)
+        j++;
+    cout << __func__ << ":\t" << g_n << "\t" << j << endl;
 }
 
 void thread_local_test()
@@ -32,8 +29,8 @@ void thread_local_test()
     FUNC_HEAD();
     thread t1(f);
     thread t2(f);
-    thread t3(foo);
-    thread t4(foo);
+    thread t3(g);
+    thread t4(g);
 
     t1.join();
     t2.join();
@@ -66,6 +63,8 @@ void thread_safe_2()
 void thread_safe_test()
 {
     FUNC_HEAD();
+
+    cout << "thread safe start gi=:\t" << gi << endl;
     thread t1(thread_safe_2);
     thread t2(thread_safe_1);
     thread t3(thread_safe_1);
@@ -76,7 +75,7 @@ void thread_safe_test()
     t3.join();
     t4.join();
 
-    cout << "thread safe :\t" << (gi == 1000) << endl;
+    cout << "thread safe end   gi=:\t" << gi << endl;
 }
 
 //可重入函数：可重入函数是线程安全函数的一种，其特点在于它们被多个线程调用时，不会引用任何共享数据。

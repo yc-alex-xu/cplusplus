@@ -1,10 +1,6 @@
 /*
-g++ -std=c++14 -lpthread  
-
-for Ubuntu, -lpthread must be at the end of command line
-$ g++ -std=c++14   async.cpp -lpthread
-
-and a very good news: it can run under WSL
+for WSL/Ubuntu, -lpthread must be at the end of command line
+$ g++ async.cpp -lpthread
 */
 
 #include <algorithm>
@@ -17,23 +13,21 @@ and a very good news: it can run under WSL
 #include "../toolkit.h"
 using namespace std;
 
-template <typename RandomIt>
-int parallel_sum(RandomIt beg, RandomIt end)
+template <typename T>
+int parallel_sum(T beg, T end)
 {
-  chrono::seconds sec(1);
   auto len = end - beg;
 
   if (len < 1000)
   {
-    cout << "this thread can't split, here len=" + to_string(len) + "\n";
-    cout.flush();
-    this_thread::sleep_for(sec);
+    cout << "len=" + to_string(len) + "\n";  //output once to avoid interrupt
+    this_thread::sleep_for(1ms);
     return accumulate(beg, end, 0); //Defined in header <numeric>
   }
 
-  RandomIt mid = beg + len / 2;
+  T mid = beg + len / 2;
   auto handle =
-      async(launch::async, parallel_sum<RandomIt>, mid, end);
+      async(launch::async, parallel_sum<T>, mid, end);
   int sum = parallel_sum(beg, mid);
   return sum + handle.get();
 }
