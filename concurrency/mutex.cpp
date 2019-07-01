@@ -1,5 +1,5 @@
 /* 
-* $g++ -std=c++14 mutex_conditon.cpp -lpthread
+* $g++ -std=c++14 mutex.cpp -lpthread
 */
 #include <iostream>
 #include <mutex>
@@ -89,7 +89,6 @@ void mutex_test()
               "\t thread 2 return:" + to_string(res2) + "\n";
 }
 
-
 class some_data
 {
   int a;
@@ -121,7 +120,7 @@ void malicious_function(some_data &protected_data)
   unprotected = &protected_data;
 }
 
-void foo()
+void bypass_mutex_test()
 {
   data_wrapper x;
   FUNC_HEAD();
@@ -133,6 +132,6 @@ int main()
 {
   mutex_test();
 
-  foo();
+  bypass_mutex_test();
   return 0;
 }
