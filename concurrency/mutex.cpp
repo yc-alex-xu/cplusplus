@@ -52,7 +52,8 @@ void f_seq(vector<double> &v, double &sum)
 {
   FUNC_HEAD();
   sum = 0;
-  unique_lock<mutex> lck{m_cout};
+  //比std:lock_guard更加灵活。
+  unique_lock lck{m_cout};
   for (auto x : v)
   {
     cout << x << "\t";
@@ -60,7 +61,6 @@ void f_seq(vector<double> &v, double &sum)
   }
   cout << endl;
   cout.flush();
-  m_cout.unlock(); //will unlock implicitly  when func end
 }
 
 #include <utility>
