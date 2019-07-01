@@ -4,7 +4,6 @@ $ g++ -std=c++14 async2.cpp -lpthread
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <numeric>
 #include <future>
 #include "../toolkit.h"
@@ -15,25 +14,23 @@ T async_sum(Iterator first, Iterator last, T init)
 {
   FUNC_HEAD();
 
-  int const length = std::distance(first, last);
-  if (!length) // 1
+  int const length = distance(first, last);
+  if (!length)
     return init;
 
   int const min_per_thread = 1000;
   int const max_threads =
-      (length + min_per_thread - 1) / min_per_thread; // 2
+      (length + min_per_thread - 1) / min_per_thread;
 
-  int const hardware_threads =
-      std::thread::hardware_concurrency();
+  int const hardware_threads = thread::hardware_concurrency();
 
   cout << " hardware_threads: " << hardware_threads << endl;
-  int const num_threads = // 3
-      std::min(hardware_threads != 0 ? hardware_threads : 2, max_threads);
+  int const num_threads = min(hardware_threads != 0 ? hardware_threads : 2, max_threads);
 
   cout << " num_threads: " << num_threads << endl;
-  int const block_size = length / num_threads; // 4
+  int const block_size = length / num_threads;
 
-  std::vector<std::future<int>> threads(num_threads); // 5
+  vector<future<int>> threads(num_threads);
 
   auto iter = first;
   for (auto i = 0; i < num_threads; ++i)
@@ -46,7 +43,7 @@ T async_sum(Iterator first, Iterator last, T init)
     /*
 The template function async runs the function f asynchronously
  (potentially in a separate thread which may be part of a thread pool) 
- and returns a std::future that will eventually hold the result of that function call.
+ and returns a future that will eventually hold the result of that function call.
 
  limitation: no rsource lock needed
 */
@@ -66,5 +63,5 @@ int main()
   vector<int> v(1000000, 1);
   int init = 0;
   auto sum = async_sum(v.begin(), v.end(), init);
-  cout << "\n\nThe sum =" << sum << endl;
+  cout << "The sum =" << sum << endl;
 }

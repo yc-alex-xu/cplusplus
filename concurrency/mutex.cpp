@@ -9,7 +9,7 @@
 #include "../toolkit.h"
 
 using namespace std;
-mutex m;
+mutex mutex_simple;
 
 struct F
 { // function object
@@ -24,9 +24,9 @@ struct F
     *res = 0;
     for (auto x : v)
     {
-      m.lock();
+      mutex_simple.lock();
       cout << x << "\t";
-      m.unlock();
+      mutex_simple.unlock();
       *res += x;
     }
     cout << endl;
@@ -39,9 +39,9 @@ void f(vector<double> &v, double &sum)
   sum = 0;
   for (auto x : v)
   {
-    m.lock();
+    mutex_simple.lock();
     cout << x << "\t";
-    m.unlock();
+    mutex_simple.unlock();
     sum += x;
   }
   cout << endl;
@@ -102,13 +102,13 @@ class data_wrapper
 {
 private:
   some_data data;
-  std::mutex m;
+  std::mutex mutex_simple;
 
 public:
   template <typename Function>
   void process_data(Function func)
   {
-    std::lock_guard<std::mutex> l(m);
+    std::lock_guard<std::mutex> l(mutex_simple);
     func(data); // 1 传递“保护”数据给用户函数
   }
 };
