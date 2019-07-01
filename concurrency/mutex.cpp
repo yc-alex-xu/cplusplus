@@ -89,55 +89,50 @@ void mutex_test()
               "\t thread 2 return:" + to_string(res2) + "\n";
 }
 
-#include <condition_variable>
-#include <queue>
 
-struct Message
+class some_data
 {
-  Message(string s) : body(s){};
-  string body;
+  int a;
+  std::string b;
+
+public:
+  void do_something() { cout << "do_something\n"; };
 };
-queue<Message> mqueue;    // the queue of messages
-condition_variable mcond; // the variable communicating events
-mutex mmutex;             // the locking mechanism
-void consumer()
+
+class data_wrapper
 {
-  for (;;)
+private:
+  some_data data;
+  std::mutex m;
+
+public:
+  template <typename Function>
+  void process_data(Function func)
   {
-    unique_lock<mutex> lck{mmutex};
-    mcond.wait(lck);
-    while (!mqueue.empty())
-    {
-      auto m = mqueue.front();
-      mqueue.pop();
-      cout << m.body << endl;
-    }
+    std::lock_guard<std::mutex> l(m);
+    func(data); // 1 传递“保护”数据给用户函数
   }
+};
+
+some_data *unprotected;
+
+void malicious_function(some_data &protected_data)
+{
+  unprotected = &protected_data;
 }
 
-void producer()
+void foo()
 {
-  for (int i = 0; i < 10; i++)
-  {
-    Message m("messge:" + to_string(i));
-    unique_lock<mutex> lck{mmutex};
-    mqueue.push(m);
-    mcond.notify_one(); // notify
-  }
-}
-
-void cond_test()
-{
+  data_wrapper x;
   FUNC_HEAD();
-  thread t1(producer);
-  thread t2(consumer);
-  t1.join();
-  t2.join();
+  x.process_data(malicious_function); // 2 传递一个恶意函数
+  unprotected->do_something();        // 3 在无保护的情况下访问保护数据
 }
 
 int main()
 {
   mutex_test();
-  cond_test();
+
+  foo();
   return 0;
 }
