@@ -1,0 +1,36 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // the variable name check: https://code.visualstudio.com/docs/editor/variables-reference  
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "file",
+            "command": "clang++",
+            "args": [
+                "-v",
+                "-g",
+                "-stdlib=libc++",
+                "-lc++abi",
+                "-pthread",
+                "${file}",
+                "-o${fileBasenameNoExtension}.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "cd ${fileDirname};make  -f ../Makefile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

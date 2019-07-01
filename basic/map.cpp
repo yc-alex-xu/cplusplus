@@ -3,25 +3,26 @@
 #include <unordered_map>
 #include <map>
 #include "../toolkit.h"
+using namespace std;
 
 void test_map()
 {
     FUNC_HEAD();
     // 两组结构按同样的顺序初始化
-    std ::unordered_map<int, std ::string> u = {
+    unordered_map<int, string> u = {
         {1, "1"},
         {3, "3"},
         {2, "2"}};
-    std ::map<int, std ::string> v = {{1, "1"}, {3, "3"}, {2, "2"}}; 
+    map<int, string> v = {{1, "1"}, {3, "3"}, {2, "2"}}; 
     
     // 分别对两组结构进行遍历
-    std ::cout << " std :: unordered_map " << std ::endl;
+    cout << "  unordered_map " << endl;
     for (const auto &n : u)
-        std ::cout << "Key :[" << n.first << "] Value :[" << n.second << "]\n";
-    std ::cout << std ::endl;
-    std ::cout << " std :: map " << std ::endl;
+        cout << "Key :[" << n.first << "] Value :[" << n.second << "]\n";
+    cout << endl;
+    cout << "  map " << endl;
     for (const auto &n : v)
-        std ::cout << "Key :[" << n.first << "] Value :[" << n.second << "]\n";
+        cout << "Key :[" << n.first << "] Value :[" << n.second << "]\n";
 }
 
 
