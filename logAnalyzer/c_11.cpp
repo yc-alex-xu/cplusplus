@@ -10,7 +10,11 @@ g++ -Wall (-DDEBUG) -static -std=c++11 -o logB
 
 using namespace std;
 
-using TRACE = map<int, string>;
+/*
+data type
+ */
+
+using MAP = map<int, string>;
 
 struct UPCUL_211 //after SE
 {
@@ -55,11 +59,26 @@ struct SE_newTx
     int srCause;
     int srType;
 };
-
+/*
+global variable
+ */
 ifstream fs_in;
 ofstream fs_out;
 
-//返回(xvalue, expiring value) 右值引用延长临时对象生命周期 而不是copy 一个string
+/*
+internal func
+ */
+bool startsWith(string &s, const string &sub)
+{
+    return s.find(sub) == 0 ? true : false;
+}
+
+bool endsWith(string &s, const string &sub)
+{
+    return s.rfind(sub) == (s.length() - sub.length()) ? true : false;
+}
+
+//here return (xvalue, expiring value) , not a copy
 string scan_item(string &line, string pat, string ending = " ")
 {
     string::size_type n1, n2;
@@ -94,37 +113,101 @@ int get_trace_info(string &line, UPCUL_211 &trace)
 int get_trace_info(string &line, UPCUL_123 &trace)
 {
     trace.bbUeRef = stoul(scan_item(line, "bbUeRef="), 0, 0);
-    trace.isSrReceived = stoul(scan_item(line, "isSrReceived="));
-    trace.srCause = stoul(scan_item(line, "srCause="));
-    trace.srType = stoul(scan_item(line, "srType="));
+    trace.isSrReceived = stoi(scan_item(line, "isSrReceived="));
+    trace.srCause = stoi(scan_item(line, "srCause="));
+    trace.srType = stoi(scan_item(line, "srType="));
     return 0;
 }
 
-int get_se_info(string &str_se_info, SE_newTx &se)
+int get_trace_info(string &line, UPCUL_170 &trace)
 {
+    trace.bbUeRef = stoul(scan_item(line, "bbUeRef="), 0, 0);
+    trace.isSrReceived = stoi(scan_item(line, "isSrReceived="));
+    return 0;
+}
+int get_se_info(string &line, SE_newTx &se)
+{
+    se.bbUeRef = stoul(scan_item(line, "bbUeRef:", ","));
 
+    se.isUlMuMimoCandidate = stoi(scan_item(line, "isUlMuMimoCandidate:",","));
+    se.muMimoPairedSeType = stoi(scan_item(line, "muMimoPairedSeType:",","));
+    se.tbs = stoi(scan_item(line, "tbs:",","));
+    se.pathThroughTfs = stoi(scan_item(line, "pathThroughTfs:", ","));
+    se.pathThroughTfs2 = stoi(scan_item(line, "pathThroughTfs2:", ","));
+    se.csiDecisionBitmap = stoi(scan_item(line, "csiDecisionBitmap:", ","));
+    se.spsActivationPending = stoi(scan_item(line, "spsActivationPending:", ","));
+    se.hasPucchTransmission = stoi(scan_item(line, "hasPucchTransmission:", ","));
+ 
+    se.isSrReceived = stoi(scan_item(line, "isSrReceived:",","));
+    se.srCause = stoi(scan_item(line, "srCause:"","));
+    se.srType = stoi(scan_item(line, "srType:"","));
+    se.isSrReceived = stoul(scan_item(line, "isSrReceived:", ","));
     return 0;
 }
 
-bool trace_matched(SE_newTx &se, UPCUL_123 &trace_123, UPCUL_211 &trace_211)
+bool trace_matched(SE_newTx *se, UPCUL_123 *trace_123, 
+    UPCUL_170 *trace_170,UPCUL_211 *trace_211)
 {
-    return true;
-    if (!(trace_211.csiDecisionBitmap == se.csiDecisionBitmap && trace_211.hasPucchTransmission == se.hasPucchTransmission && trace_211.pathThroughTfs == se.pathThroughTfs && trace_211.servCellIndex == se.servCellIndex && trace_211.spsActivationPending == se.spsActivationPending && trace_211.tbs == se.tbs))
+    if(trace_170 != nullptr
+       && trace_170->isSrReceived != se->isSrReceived)
+    {
+        return false;
+    } 
+
+    if (!(
+     trace_211->csiDecisionBitmap == se->csiDecisionBitmap
+     && trace_211->hasPucchTransmission == se->hasPucchTransmission
+     && trace_211->pathThroughTfs == se->pathThroughTfs
+     && trace_211->servCellIndex == se->servCellIndex
+     && trace_211->spsActivationPending == se->spsActivationPending
+     && trace_211->tbs == se->tbs))
     {
         return false;
     }
 
-    if ((trace_211.isUlMuMimoCandidate) && (trace_211.muMimoPairedSeType != se.muMimoPairedSeType))
+    if ((trace_211->isUlMuMimoCandidate)
+     && (trace_211->muMimoPairedSeType != se->muMimoPairedSeType))
     {
         return false;
     }
-    /*   
-    if (!(trace_123.srCause == se.srCause && trace_123.isSrReceived == se.isSrReceived && trace_123.srType == se.srType))
+       
+    if (!(
+        trace_123->srCause == se->srCause 
+        && trace_123->isSrReceived == se->isSrReceived 
+        && trace_123->srType == se->srType))
     {
         return false;
     }
-*/
     return true;
+}
+/*
+return false if not found
+ */
+template <typename T>
+bool get_trace(unsigned long bbUeRef,MAP &map_trace,T &trace)
+{
+    string str_trace;
+    auto iter = map_trace.find(bbUeRef);
+    if (iter != map_trace.end())
+    {
+        str_trace = map_trace[bbUeRef];
+        fs_out << str_trace;
+    }
+    else
+    {
+        return false;
+    }
+    get_trace_info(str_trace, trace);
+    if (map_trace.size() > 1000)
+    {
+        map_trace.clear();
+    }
+    else
+    {
+        map_trace.erase(iter);
+    }
+    return true;
+
 }
 
 /*
@@ -133,43 +216,30 @@ if matched return 0;
 else if preceeding trace missing return >0
 else <0
 */
-inline int compare_trace(string &str_se_info, TRACE map_123, UPCUL_211 trace_211)
+int compare_trace(string &str_se_info, MAP &map_123,MAP &map_170, UPCUL_211 &trace_211)
 {
     SE_newTx se;
     get_se_info(str_se_info, se);
 
-    string str_trace;
-    auto iter = map_123.find(se.bbUeRef);
-    if (iter != map_123.end())
+    UPCUL_123 trace_123;
+    if (!get_trace(se.bbUeRef,map_123,trace_123))
     {
-        str_trace = map_123[se.bbUeRef];
-        fs_out << str_trace << str_se_info;
-    }
-    else
-    {
-#ifdef DEBUG
-        fs_out << "can't found " << se.bbUeRef << endl;
-#endif
         return 1;
     }
-    UPCUL_123 trace_123;
-    get_trace_info(str_trace, trace_123);
-    if (map_123.size() > 1000)
+    UPCUL_170 trace_170;
+    if (!get_trace(se.bbUeRef,map_170,trace_170))
     {
-        map_123.clear();
+        return 2;
     }
-    else
-    {
-        map_123.erase(iter);
-    }
+    fs_out << str_se_info << endl;
 
-    if (trace_matched(se, trace_123, trace_211))
+    if (trace_matched(&se, &trace_123, &trace_170, &trace_211))
         return 0;
     else
         return -1;
 }
 
-inline void update_progress(int lineno)
+void update_progress(int lineno)
 {
     static int count = 1;
     if (lineno > count * 100000)
@@ -182,7 +252,9 @@ inline void update_progress(int lineno)
     }
 }
 
-//return true if the requried se type met
+/*
+return true if the requried se type met
+ */
 bool read_se(string &str_se_info, unsigned long &lineno, unsigned long &bbUeRef)
 {
     string line;
@@ -191,22 +263,16 @@ bool read_se(string &str_se_info, unsigned long &lineno, unsigned long &bbUeRef)
     {
         lineno++;
         str_se_info += line + "\n";
-        if (line.find("newTxSeData {\r") < string::npos) //need verify
+        if (endsWith(line,"newTxSeData {") )//need verify
         {
-#ifdef DEBUG
-            fs_out << "------> iua found" << endl;
-#endif
             b_se_found = true;
         }
-        else if (line.find("bbUeRef") < string::npos)
+        else if (line.find("bbUeRef:") < string::npos)
         {
-            bbUeRef = stoul(scan_item(line, "bbUeRef", ","));
+            bbUeRef = stoul(scan_item(line, "bbUeRef:", ","));
         }
-        else if (line.find("}\r") < string::npos)
+        else if (endsWith(line,"}"))
         {
-#ifdef DEBUG
-            fs_out << "------>end of  iua found" << endl;
-#endif
             break;
         }
     }
@@ -220,7 +286,7 @@ int checklog(long &count)
     unsigned long bbUeRef_se = 0;
     bool b_se_found = false;
     string str_se_info;
-    TRACE map_123;
+    MAP map_123,map_170;
 
     for (string line; (status >= 0) && getline(fs_in, line);)
     {
@@ -229,30 +295,27 @@ int checklog(long &count)
         if (line.find("<!UPCUL.211!>") < string::npos)
         {
             unsigned long bbUeRef = stoul(scan_item(line, "bbUeRef="), 0, 0);
-#ifdef DEBUG
-            fs_out << "------> trace found" << bbUeRef << endl;
-#endif
             if (b_se_found && bbUeRef == bbUeRef_se)
             {
                 UPCUL_211 trace_211;
                 get_trace_info(line, trace_211);
                 count++;
-                status = compare_trace(str_se_info, map_123, trace_211);
+                status = compare_trace(str_se_info, map_123,map_170, trace_211);
+                fs_out <<lineno<<":"<<line <<endl;
             }
+        }
+        else if (line.find("<!UPCUL.170!>") < string::npos)
+        {
+            unsigned long bbUeRef = stoul(scan_item(line, "bbUeRef="), 0, 0);
+            map_170[bbUeRef] = to_string(lineno) + ":" + line + "\n";
         }
         else if (line.find("<!UPCUL.123!>") < string::npos)
         {
             unsigned long bbUeRef = stoul(scan_item(line, "bbUeRef="), 0, 0);
-#ifdef DEBUG
-            fs_out << "------> trace found" << bbUeRef << endl;
-#endif
             map_123[bbUeRef] = to_string(lineno) + ":" + line + "\n";
         }
         else if (line.find("seSchedInfoList {") < string::npos)
         {
-#ifdef DEBUG
-            fs_out << "------> bbUeRef found" << endl;
-#endif
             str_se_info = to_string(lineno) + ":" + line + "\n";
             b_se_found = read_se(str_se_info, lineno, bbUeRef_se);
         }
@@ -262,6 +325,7 @@ int checklog(long &count)
         }
     }
     map_123.clear();
+    map_170.clear();
     return status;
 }
 

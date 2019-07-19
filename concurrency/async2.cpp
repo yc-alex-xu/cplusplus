@@ -60,6 +60,18 @@ The template function async runs the function f asynchronously
 
 int main()
 {
+  struct {
+    int a;
+    int b;
+  } ccc;
+  ccc.a = 1;
+  int reqtbs = 200;
+  int  tb = 25;
+  reqtbs = (reqtbs << 13) +tb;
+  
+  tb = reqtbs & 0xffff;
+  reqtbs = reqtbs >> 13;
+
   vector<int> v(1000000, 1);
   int init = 0;
   auto sum = async_sum(v.begin(), v.end(), init);
