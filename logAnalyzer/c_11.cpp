@@ -43,6 +43,7 @@ struct UPCUL_170 //before SE, higher order than UPCUL_123
     unsigned long bbUeRef;
     int isSrReceived;
 };
+
 struct SE_newTx
 {
     unsigned long bbUeRef;

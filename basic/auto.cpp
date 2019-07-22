@@ -2,7 +2,7 @@
 #include <string>
 using namespace std;
 
-// after c ++14
+// after c++14
 template <typename T, typename U>
 auto add3(T x, U y)
 {
