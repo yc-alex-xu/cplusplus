@@ -59,6 +59,7 @@ struct SE_newTx
     int srCause;
     int srType;
 };
+
 /*
 global variable
  */
@@ -78,7 +79,7 @@ bool endsWith(string &s, const string &sub)
     return s.rfind(sub) == (s.length() - sub.length()) ? true : false;
 }
 
-//here return (xvalue, expiring value) , not a copy
+//return xvalue(expiring value), not a copy
 string scan_item(string &line, string pat, string ending = " ")
 {
     string::size_type n1, n2;
@@ -125,6 +126,7 @@ int get_trace_info(string &line, UPCUL_170 &trace)
     trace.isSrReceived = stoi(scan_item(line, "isSrReceived="));
     return 0;
 }
+
 int get_se_info(string &line, SE_newTx &se)
 {
     se.bbUeRef = stoul(scan_item(line, "bbUeRef:", ","));
@@ -180,6 +182,7 @@ bool trace_matched(SE_newTx *se, UPCUL_123 *trace_123,
     }
     return true;
 }
+
 /*
 return false if not found
  */
@@ -216,7 +219,8 @@ if matched return 0;
 else if preceeding trace missing return >0
 else <0
 */
-int compare_trace(string &str_se_info, MAP &map_123,MAP &map_170, UPCUL_211 &trace_211)
+int compare_trace(string &str_se_info, MAP &map_123,MAP &map_170,
+ UPCUL_211 &trace_211)
 {
     SE_newTx se;
     get_se_info(str_se_info, se);
