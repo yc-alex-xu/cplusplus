@@ -142,9 +142,8 @@ int get_se_info(string &line, SE_newTx &se)
     se.hasPucchTransmission = stoi(scan_item(line, "hasPucchTransmission:", ","));
  
     se.isSrReceived = stoi(scan_item(line, "isSrReceived:",","));
-    se.srCause = stoi(scan_item(line, "srCause:"","));
-    se.srType = stoi(scan_item(line, "srType:"","));
-    se.isSrReceived = stoul(scan_item(line, "isSrReceived:", ","));
+    se.srCause = stoi(scan_item(line, "srCause:",","));
+    se.srType = stoi(scan_item(line, "srType:",","));
     return 0;
 }
 
@@ -195,7 +194,7 @@ bool get_trace(unsigned long bbUeRef,MAP &map_trace,T &trace)
     if (iter != map_trace.end())
     {
         str_trace = map_trace[bbUeRef];
-        fs_out << str_trace;
+        fs_out << str_trace << endl;
     }
     else
     {
