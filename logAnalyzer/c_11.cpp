@@ -131,7 +131,7 @@ int get_trace_info(string &line, UPCUL_170 &trace)
 int get_se_info(string &line, SE_newTx &se)
 {
     se.bbUeRef = stoul(scan_item(line, "bbUeRef:", ","));
-
+    se.servCellIndex = stoi(scan_item(line, "servCellIndex:",",")); 
     se.isUlMuMimoCandidate = stoi(scan_item(line, "isUlMuMimoCandidate:",","));
     se.muMimoPairedSeType = stoi(scan_item(line, "muMimoPairedSeType:",","));
     se.tbs = stoi(scan_item(line, "tbs:",","));
