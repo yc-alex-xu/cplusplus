@@ -291,8 +291,9 @@ int checklog(long &count)
     bool b_se_found = false;
     string str_se_info;
     MAP map_123,map_170;
+    const int MAX_SE = 50;
 
-    for (string line; (status >= 0) && getline(fs_in, line);)
+    for (string line; (status >= 0) && count < MAX_SE && getline(fs_in, line);)
     {
         ++lineno;
         update_progress(lineno);
