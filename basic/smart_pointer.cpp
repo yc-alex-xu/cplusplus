@@ -3,6 +3,9 @@
 #include "../toolkit.h"
 using namespace std;
 
+/*
+test_shared_ptr()
+ */
 void foo(shared_ptr<int> i)
 {
     (*i)++;
@@ -17,6 +20,10 @@ void test_shared_ptr()
     cout << *pointer << endl; // 11
     // 离开作用域前， shared_ptr 会被析构， 从而释放内存
 }
+
+/*
+test_shared_ptr2()
+ */
 
 //reset() 来减少一个引用计数???   use_count()来查看一个对象的引用计数。
 void test_shared_ptr2()
@@ -47,6 +54,9 @@ void test_shared_ptr2()
     cout << " pointer3.use_count () = " << pointer3.use_count() << endl; //
 }
 
+/*
+test_shared_ptr3()
+ */
 struct A;
 struct B;
 
@@ -55,7 +65,7 @@ struct A
     shared_ptr<B> pointer;
     ~A()
     {
-        cout << "A 被销毁" << endl;
+        cout << "A destroyed" << endl;
     }
 };
 
@@ -64,7 +74,7 @@ struct B
     shared_ptr<A> pointer;
     ~B()
     {
-        cout << "B 被销毁" << endl;
+        cout << "B destroyed" << endl;
     }
 };
 
@@ -78,6 +88,10 @@ int test_shared_ptr3()
     // a->pointer = b;
     // b->pointer = a;
 }
+
+/*
+test_unique_ptr()
+ */
 
 struct Foo
 {
@@ -122,6 +136,10 @@ int test_unique_ptr()
     // Foo 的实例会在离开作用域时被销毁
 }
 
+/*
+
+test_weak_ptr()
+ */
 std::weak_ptr<int> gw;
 
 void observe()
@@ -150,6 +168,9 @@ void test_weak_ptr()
     observe();
 }
 
+/*
+test_weak_ptr2()
+ */
 struct C;
 struct D;
 
@@ -158,7 +179,7 @@ struct C
     weak_ptr<D> pointer;
     ~C()
     {
-        cout << "C 被销毁" << endl;
+        cout << "C destroyed" << endl;
     }
 };
 
@@ -167,7 +188,7 @@ struct D
     weak_ptr<C> pointer;
     ~D()
     {
-        cout << "D 被销毁" << endl;
+        cout << "D destroyed" << endl;
     }
 };
 

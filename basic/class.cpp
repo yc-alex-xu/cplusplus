@@ -14,7 +14,6 @@ private:
     static double m_rate;
 
 public:
-    double get_rate() { return m_rate; }
     static void set_rate(const double &x)
     {
         m_rate = x;
@@ -29,7 +28,6 @@ void static_method_field()
     Account a;
     Account::set_rate(5.0);
     a.set_rate(7.0);
-    cout << "at last,rate was set as " << a.get_rate() << endl;
 }
 
 class a
@@ -55,7 +53,8 @@ public:
     ~c() { cout << "~c" << endl; }
 };
 
-/* check the order of construction/deconstruction
+/* 
+check the order of construction/deconstruction
 */
 int virtual_test()
 {
@@ -66,9 +65,140 @@ int virtual_test()
     return 0;
 }
 
+/* 
+the example of friend class
+ */
+
+class StackIter;
+
+class Stack
+{
+private:
+    int items[10];
+    int sp;
+
+public:
+    friend class StackIter;
+    Stack()
+    {
+        sp = -1;
+    }
+    void push(int in)
+    {
+        items[++sp] = in;
+    }
+    int pop()
+    {
+        return items[sp--];
+    }
+    bool isEmpty()
+    {
+        return (sp == -1);
+    }
+    StackIter *createIterator() const;
+};
+
+class StackIter
+{
+    const Stack *stk;
+    int index;
+
+public:
+    StackIter(const Stack *s)
+    {
+        stk = s;
+    }
+    void first()
+    {
+        index = 0;
+    }
+    void next()
+    {
+        index++;
+    }
+    bool isDone()
+    {
+        return index == stk->sp + 1;
+    }
+    int currentItem()
+    {
+        return stk->items[index];
+    }
+};
+
+StackIter *Stack::createIterator() const
+{
+    return new StackIter(this);
+}
+
+bool operator==(const Stack &l, const Stack &r)
+{
+
+    StackIter *itl = l.createIterator();
+    StackIter *itr = r.createIterator();
+
+    for (itl->first(), itr->first(); !itl->isDone(); itl->next(), itr->next())
+        if (itl->currentItem() != itr->currentItem())
+            break;
+    bool ans = itl->isDone() && itr->isDone();
+    delete itl;
+    delete itr;
+    return ans;
+}
+
+int friend_test()
+{
+    FUNC_HEAD();
+    Stack s1;
+    for (int i = 1; i < 5; i++)
+        s1.push(i);
+    Stack s2(s1), s3(s1); //no copy construction defined, using default one
+    s3.pop();
+    cout << "s1==s2?: " << (s1 == s2) << endl;
+    cout << "s1==s3?: " << (s1 == s3) << endl;
+}
+
+/*
+operator
+ */
+
+struct USCurrency
+{
+    int dollars;
+    int cents;
+    USCurrency operator+(const USCurrency c)
+    {
+        this->cents += c.cents;
+        this->dollars += c.dollars;
+        if (this->cents >= 100)
+        {
+            this->cents -= 100;
+            this->dollars++;
+        }
+        return *this;
+    }
+};
+
+ostream &operator<<(ostream &out, const USCurrency &c)
+{
+    out << "$" << c.dollars << "." << c.cents;
+    return out;
+}
+int operator_test()
+{
+    FUNC_HEAD();
+    USCurrency a = {2, 50};
+    USCurrency b = {1, 75};
+    USCurrency c = a + b;
+    cout << c << endl;
+    return 0;
+}
+
 int main()
 {
     static_method_field();
     virtual_test();
+    friend_test();
+    operator_test();
     return 0;
 }

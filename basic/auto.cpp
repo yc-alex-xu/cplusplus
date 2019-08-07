@@ -12,17 +12,9 @@ auto add3(T x, U y)
     return x + y;
 }
 
-decltype(auto) look_up_a_string_1()
+decltype(auto) look_up_a_string()
 {
-    FUNC_HEAD();
     string s = "abc";
-    return s;
-}
-
-auto look_up_a_string_2()
-{
-    FUNC_HEAD();
-    string s = "efg";
     return s;
 }
 
@@ -39,14 +31,14 @@ int decltype_test()
         cout << " type x == float " << endl;
     if (is_same<decltype(x), decltype(z)>::value)
         cout << " type z == type x" << endl;
+    auto s = look_up_a_string();
+    if (is_same<decltype(s), string>::value)
+        cout << " type s == string " << endl;
 }
 
 int main()
 {
     auto q = add3(1.0, 2);
     cout << "q: " << q << endl;
-    cout << look_up_a_string_1() << endl;
-    cout << look_up_a_string_2() << endl;
-
     decltype_test();
 }

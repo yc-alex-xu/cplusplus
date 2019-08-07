@@ -6,6 +6,7 @@
 #include <string>
 #include <stdexcept>
 #include "../toolkit.h"
+using namespace std;
  
 std::tuple<double, char, std::string> get_student(int id)
 {

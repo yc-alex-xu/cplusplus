@@ -16,11 +16,8 @@ void print_array(array<T, N> &arr)
 void test1()
 {
     FUNC_HEAD();
-    array<int, 3> arr1{1, 2, 3};
-    array<int, 3> arr2 = {4, 5}; //run result: 4/5/0
-    print_array(arr1);
-    cout << endl;
-    print_array(arr2);
+    array<int, 3> arr = {4, 5}; //run result: 4/5/0
+    print_array(arr);
     cout << endl;
 }
 

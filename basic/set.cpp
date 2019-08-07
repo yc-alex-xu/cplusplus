@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "../toolkit.h"
 
+using namespace std;
+
 int stl_set_test()
 {
     FUNC_HEAD();

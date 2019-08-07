@@ -1,7 +1,6 @@
 //g++  -g -std=c++14
 
 #include <algorithm>
-#include <array>
 #include <bitset>
 #include <chrono>
 #include <cmath>
