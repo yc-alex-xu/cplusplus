@@ -8,16 +8,7 @@
 
 using namespace std;
 
-template <typename T>
-T sum(const vector<T> &v) //will not modify its argument
-{
-  T sum = 0;
-  for (auto i : v)
-    sum += i;
-  return sum;
-}
-
-void some_function() // function that doesn’t return a value
+void foo() // function that doesn’t return a value
 {
   FUNC_HEAD();
   double d = 2.2; // initialize floating-point number
@@ -52,28 +43,6 @@ void some_function() // function that doesn’t return a value
   constexpr double max1 = 1.4 * dmv;
   // constexpr double max2 = 1.4 * var; // error : var is not a constant expression
   const double max3 = 1.4 * var; // OK, may be evaluated at run time
-
-  vector<double> v{1.2, 3.4, 4.5}; // v is not a constant
-  const double s1 = sum(v);        // OK: evaluated at run time
-  // constexpr double s2 = sum(v); // error : sum(v) not constant expression
-}
-
-void iter_a_array()
-{
-  int arr[4];
-  FUNC_HEAD();
-
-  for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
-  {
-    arr[i] = i * i;
-  }
-
-  for (auto &v : arr)
-  {
-    v--;
-    cout << v << '\t';
-  }
-  cout << endl;
 }
 
 void find_bias()
@@ -146,43 +115,6 @@ void static_method_field()
   cout << "at last,rate was set as " << a.get_rate() << endl;
 }
 
-int stl_set_test()
-{
-  FUNC_HEAD();
-  set<int> iset;
-  iset.insert(11);
-  iset.insert(55);
-  iset.insert(33);
-  iset.insert(44);
-  iset.insert(22);
-
-  set<int>::iterator it;
-  for (it = iset.begin(); it != iset.end(); it++)
-  {
-    cout << *it << "\t";
-  }
-  cout << endl;
-
-  int i = 33;
-  if (binary_search(iset.begin(), iset.end(), i))
-    cout << "found " << i << endl;
-  else
-    cout << "can't find " << i << endl;
-}
-
-void alg_test()
-{
-  FUNC_HEAD();
-  int a[] = {5, 7, 2, 1};
-  sort(a, a + 4);
-  ;
-  rotate(a, a + 2, a + 4);
-  reverse(a, a + 4);
-  for (auto v : a)
-    cout << v << "\t";
-  cout << endl;
-}
-
 class a
 {
 public:
@@ -219,15 +151,11 @@ int virtual_test()
 
 int main()
 {
-  some_function();
-  iter_a_array();
+  foo();
   sizes();
   find_bias();
   static_method_field();
-  stl_set_test();
-  alg_test();
   virtual_test();
-
   catch_exception(); //must be last one, because it will abort() the execution
   return 0;
 }

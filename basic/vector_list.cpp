@@ -13,6 +13,7 @@ void print_array(T *p, U len)
   for (int i = 0; i < len; i++)
     cout << *p++ << endl;
 }
+
 void test_array()
 {
   FUNC_HEAD();
@@ -57,10 +58,29 @@ void test_vec_list()
   cout << endl;
 }
 
+template <typename T>
+T sum(const vector<T> &v) //will not modify its argument
+{
+  T sum = 0;
+  for (auto i : v)
+    sum += i;
+  return sum;
+}
+
+void test_vec_sum()
+{
+  FUNC_HEAD();
+  vector<double> v{1.2, 3.4, 4.5}; // v is not a constant
+  const double s1 = sum(v);        // OK: evaluated at run time
+  cout << s1 << endl;
+  // constexpr double s3 = sum(v); // error : sum(v) not constant expression
+}
+
 int main()
 {
   test_array();
   test_vec_list();
+  test_vec_sum();
 
   return 0;
 }
