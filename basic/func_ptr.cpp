@@ -25,7 +25,7 @@ int goo()
     return 6;
 }
 
-void function_c_test()
+void func_ptr_test()
 {
     FUNC_HEAD();
     int (*fcnPtr)() = foo;
@@ -34,7 +34,7 @@ void function_c_test()
 }
 
 /*
- Introduced in C++11, an alternate method of defining and storing function pointers is to use std::function
+ Introduced in C++11, an alternative method of defining and storing function pointers
  */
 void function_2011_test()
 {
@@ -63,26 +63,30 @@ int foo3(int a, int b, int c)
     return a + b + c;
 }
 
-int main()
+void function_para_test()
 {
-    function_c_test();
-    function_2011_test();
-    function_auto_test();
-
+    FUNC_HEAD();
     //  function 包装了一个返回值为int , 参数为int 的函数
     function<int(int)> func = foo2;
 
     int important = 10;
-    function<int(int)> func2 = [&](int value) -> int {
+    function<int(int)> func_lambda = [&](int value) -> int {
         return 1 + value + important;
     };
     auto r1 = func(10);
-    auto r2 = func2(10);
+    auto r2 = func_lambda(10);
 
     // 将参数1 ,2 绑定到函数foo 上， 但是使用std :: placeholders :: _1 来对第一个参数进行占位
     auto bindFoo = bind(foo3, std ::placeholders ::_1, 2, 3);
     // 这时调用bindFoo 时， 只需要提供第一个参数即可
     auto r3 = bindFoo(1);
+}
 
+int main()
+{
+    func_ptr_test();
+    function_2011_test();
+    function_auto_test();
+    function_para_test();
     return 0;
 }
