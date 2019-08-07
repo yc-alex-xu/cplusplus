@@ -9,14 +9,9 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <mutex>
-#include <functional>
+#include "../toolkit.h"
 
 using namespace std;
-
-mutex m;
-
-
 
 void binary(int i)
 {
@@ -26,7 +21,7 @@ void binary(int i)
 
 void bitset_test()
 {
-  cout << "begin of :" << __func__ << endl;
+  FUNC_HEAD();
 
   bitset<9> bs1{"110001111"}; // 399
   bitset<9> bs2{399};
@@ -39,6 +34,10 @@ void bitset_test()
   binary(3721);
 }
 
+/*************************
+ * for equal_range_test()
+ * 
+ */
 struct Record
 {
   string name;
@@ -70,8 +69,7 @@ void find_item(const vector<Record> &v) // assume that v is sorted on its "name"
 
 void equal_range_test()
 {
-  cout << "begin of :" << __func__ << endl;
-
+  FUNC_HEAD();
   vector<Record> vec = {
       {"John", 33}, {"Emma", 44}, {"sara", 77}, {"Smith", 33}, {"John", 77}};
 
@@ -94,43 +92,24 @@ void equal_range_test()
   find_item(vec);
 }
 
-void time_test()
-{
-  cout << "begin of :" << __func__ << endl;
-
-  using namespace std::chrono; // see §3.3
-  auto t0 = high_resolution_clock::now();
-  equal_range_test();
-  auto t1 = high_resolution_clock::now();
-  cout << "duration is:" << duration_cast<microseconds>(t1 - t0).count() << " micro sec\n";
-}
-
-int f1(double x) { return round(x); }
-function<int(double)> fct{f1}; // initialize to f1
-int f2(int x) { return -x; };
-function<int(double)> f3; // f can hold anything that can be called with a
-                          // double and return an int
-
-void function_test()
-{
-  cout << "begin of :" << __func__ << endl;
-
-  fct = [](double d) { return round(d); }; // assign lambda to fct
-  fct = f2;                                // error : incorrect argument type
-  f3 = f1;
-  cout << f3(3.14) << endl;
-}
+/*************************
+ * for limit_test()
+ * 
+ */
 
 void limit_test()
 {
-  cout << "begin of :" << __func__ << endl;
-
+  FUNC_HEAD();
   constexpr float min = numeric_limits<float>::min();
   constexpr int szi = sizeof(int);
   cout << min << endl;
   cout << szi << endl;
 }
 
+/*
+sort_test()
+
+ */
 template <typename C>
 using Iterator_type = typename C::iterator; // C’s iterator type
 template <typename Iter>
@@ -171,42 +150,38 @@ constexpr bool Is_arithmetic()
 
 void new_sort(vector<string> &v, forward_list<int> &lst)
 {
-  cout << "begin of :" << __func__ << endl;
-
   sort(v);   // sor t the vector
   sort(lst); // sor t the singly-linked list
 }
 
 void sort_test()
 {
-  cout << "begin of :" << __func__ << endl;
+  FUNC_HEAD();
 
   vector<string> v{"abc", "kkk", "jjj"};
   forward_list<int> lst{7, 8, 1};
   new_sort(v, lst);
 }
 
+/*
+ predict_test()
+ */
 void predict_test()
 {
-  cout << "begin of :" << __func__ << endl;
+  FUNC_HEAD();
 
   bool b1 = Is_arithmetic<int>();
   bool b2 = Is_arithmetic<string>();
   cout << b1 << endl
        << b2 << endl;
 }
+
 int main()
 {
   bitset_test();
-
-  time_test();
-
-  function_test();
-
+  equal_range_test();
   limit_test();
-
   sort_test();
-
   predict_test();
   return 0;
 }

@@ -31,6 +31,8 @@ int duration_test()
     cout << s.count() << "seconds\n";
 }
 
+
+
 int main()
 {
     auto t0 = high_resolution_clock::now();
