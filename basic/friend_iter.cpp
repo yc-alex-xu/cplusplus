@@ -28,12 +28,11 @@ public:
   {
     return (sp == -1);
   }
-  StackIter *createIterator() const; // 2. Add a createIterator() member
+  StackIter *createIterator() const;
 };
 
 class StackIter
 {
-  // 1. Design an "iterator" class
   const Stack *stk;
   int index;
 
@@ -52,11 +51,11 @@ public:
   }
   bool isDone()
   {
-    return index == stk->sp + 1; //error: 'sp' is a private member of 'Stack' if not friend class
+    return index == stk->sp + 1;
   }
   int currentItem()
   {
-    return stk->items[index]; //error: 'items' is a private member of 'Stack' if not friend class
+    return stk->items[index];
   }
 };
 
@@ -67,10 +66,10 @@ StackIter *Stack::createIterator() const
 
 bool operator==(const Stack &l, const Stack &r)
 {
-  // 3. Clients ask the container object to create an iterator object
+
   StackIter *itl = l.createIterator();
   StackIter *itr = r.createIterator();
-  // 4. Clients use the first(), isDone(), next(), and currentItem() protocol
+
   for (itl->first(), itr->first(); !itl->isDone(); itl->next(), itr->next())
     if (itl->currentItem() != itr->currentItem())
       break;

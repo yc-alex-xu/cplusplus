@@ -13,7 +13,7 @@ void print_array(array<T, N> &arr)
         cout << x << endl;
 }
 
-void iter_a_array()
+void print_array_2()
 {
     int arr[4];
     FUNC_HEAD();
@@ -40,7 +40,7 @@ int main()
     print_array(arr2);
     cout << endl;
 
-    iter_a_array();
+    print_array_2();
 
     return 0;
 }
