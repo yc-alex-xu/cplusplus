@@ -1,7 +1,6 @@
 //g++  -g -std=c++14
 
 #include <algorithm>
-#include <bitset>
 #include <chrono>
 #include <cmath>
 #include <forward_list>
@@ -12,83 +11,74 @@
 
 using namespace std;
 
-void binary(int i)
-{
-  bitset<8 * sizeof(int)> b = i; // assume 8-bit byte (see also §12.7)
-  cout << b.to_string() << '\n'; // wr ite out the bits of i
-}
-
-void bitset_test()
-{
-  FUNC_HEAD();
-
-  bitset<9> bs1{"110001111"}; // 399
-  bitset<9> bs2{399};
-
-  bitset<9> bs3 = ~bs1;      // complement: bs3=="001110000"   512-bs1-1
-  bitset<9> bs4 = bs1 & bs3; // all zeros
-  bitset<9> bs5 = bs1 << 2;  // shift left: bs5 = "111000000"
-  cout << bs5.to_string() << endl;
-
-  binary(3721);
-}
-
-/*************************
- * for equal_range_test()
- * 
+/*************
+ * equal_range_test()
+ * https://en.cppreference.com/w/cpp/algorithm/equal_range
  */
-struct Record
+
+struct S
 {
-  string name;
-  int score;
-  inline bool operator==(const Record &r) const
-  {
-    return (this->name == r.name);
-  }
+  int number;
+  char name;
+  // note: name is ignored by this comparison operator
+  bool operator<(const S &s) const { return number < s.number; }
 };
 
-ostream &operator<<(ostream &os, const Record &r)
+ostream &operator<<(ostream &os, const S &s)
 {
-  os << r.name << ":" << r.score << endl;
+  os << "{" << s.number << "," << s.name << "}";
   return os;
 }
 
-auto rec_eq = [](const Record &r1, const Record &r2) {
-  return r1.name < r2.name;
-};
-// compare names
-void find_item(const vector<Record> &v) // assume that v is sorted on its "name" field
-{
-  auto er = equal_range(v.begin(), v.end(), Record{"John"}, rec_eq);
-  for (auto p = er.first; p != er.second; ++p)
-    cout << *p;
-
-  cout << *(er.first) << *(er.second);
-}
-
-void equal_range_test()
+int equal_range_test()
 {
   FUNC_HEAD();
-  vector<Record> vec = {
-      {"John", 33}, {"Emma", 44}, {"sara", 77}, {"Smith", 33}, {"John", 77}};
+  // note: not ordered, only partitioned w.r.t. S defined below
+  std::vector<S> vec = {{1, 'A'}, {2, 'B'}, {2, 'C'}, {2, 'D'}, {4, 'G'}, {3, 'F'}};
 
-  sort(vec.begin(), vec.end(),
-       [](Record r1, Record r2) { return r1.name < r2.name; });
-  for (auto x : vec)
-    cout << x;
-  auto pp =
-      make_pair(vec.begin(), 2); // pp is a pair<vector<str ing>::iterator,int>
+  S value = {2, '?'};
 
-  tuple<string, int, double> t2{"Sild", 123,
-                                3.14}; // the type is explicitly specified
-  auto t = make_tuple(string{"Herring"}, 10,
-                      1.23); // the type is deduced to tuple<string,int,double>
-  string s = get<0>(t);      // get first element of tuple: "Herring"
-  int x = get<1>(t);         // 10
-  double d = get<2>(t);      // 1.23
-  cout << s << ':' << x << ':' << d << endl;
+  //Returns a range containing all elements equivalent to value in the range [first, last).
+  //The range [first, last) must be at least partially ordered with respect to value,
+  auto p = std::equal_range(vec.begin(), vec.end(), value);
+  cout << "in the vec,  the elements matched with " << value << "are:" << endl;
+  for (auto i = p.first; i != p.second; ++i)
+    std::cout << i->name << ' ';
+  std::cout << std::endl;
 
-  find_item(vec);
+  // heterogeneous comparison:
+  struct Comp
+  {
+    bool operator()(const S &s, int i) const { return s.number < i; }
+    bool operator()(int i, const S &s) const { return i < s.number; }
+  };
+
+  int num = 2;
+  cout << "in the vec, the elements matched with " << num << " are:" << endl;
+  p = std::equal_range(vec.begin(), vec.end(), num, Comp{});
+  for (auto i = p.first; i != p.second; ++i)
+    std::cout << i->name << ' ';
+  std::cout << std::endl;
+
+  num = 3;
+  cout << "in the vec, the elements matched with " << num << " are:" << endl;
+  p = std::equal_range(vec.begin(), vec.end(), num, Comp{});
+  for (auto i = p.first; i != p.second; ++i)
+    std::cout << *i << ' ';
+  std::cout << std::endl;
+
+  sort(vec.begin(), vec.end(), [](const S &s1, const S &s2) { return s1.number < s2.number; });
+  cout << "vec after sort are:" << endl;
+  for (auto &v : vec)
+    std::cout << v << ' ';
+  std::cout << std::endl;
+
+  num = 3;
+  cout << "in the vec, the elements matched with " << num << " are:" << endl;
+  p = std::equal_range(vec.begin(), vec.end(), num, Comp{});
+  for (auto i = p.first; i != p.second; ++i)
+    std::cout << *i<< ' ';
+  std::cout << std::endl;
 }
 
 /*************************
@@ -177,7 +167,6 @@ void predict_test()
 
 int main()
 {
-  bitset_test();
   equal_range_test();
   limit_test();
   sort_test();
