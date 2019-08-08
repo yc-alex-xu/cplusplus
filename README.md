@@ -1,9 +1,8 @@
->>>>>>initially  example from "tour of c++" 1e by Bjarne Stroustrup
-then from: https://github.com/changkun/modern-cpp-tutorial
-
-I'd recommended the later, whose author is not famous, but its tutorial is much better!
-
-some practise add here too
+# basic
+some c++ practising program, upto -std=c++1z
+book refered:
+* A tour of C++
+* https://github.com/changkun/modern-cpp-tutorial
 
 # logAnalyzer
 for log analysis, for tester

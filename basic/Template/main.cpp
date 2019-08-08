@@ -112,6 +112,31 @@ void test_alias()
 
 }
 
+/****
+ * 
+ */
+
+template <typename T = int, int n = 5>
+class container
+{
+private:
+  T arr[n];
+
+public:
+  void set(int i, T val) { arr[i] = val; }
+  T get(int i) { return arr[i]; }
+};
+
+void class_template_test()
+{
+  FUNC_HEAD();
+  container<float, 10> cc;
+  cc.set(0, 1.1);
+  cc.set(1, 2.2);
+  cc.set(2, 3.3);
+  cout << cc.get(0) << "\t" << cc.get(1) << "\t" << cc.get(2) << endl;
+}
+
 /*
 What are templates for? In other words, what programming techniques are effective 
 when you use templates?
@@ -146,6 +171,7 @@ int main()
   varidic_template();
 
   test_alias();
+  class_template_test();
 
   return 0;
 }
