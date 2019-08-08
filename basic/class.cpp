@@ -194,11 +194,82 @@ int operator_test()
     return 0;
 }
 
+/******
+ * 
+http://www.stroustrup.com/bstechfaq.htm
+*/
+
+class Empty
+{
+};
+
+void f()
+{
+    Empty a, b;
+    if (&a == &b)
+        cout << "impossible: report error to compiler supplier";
+
+    Empty *p1 = new Empty;
+    Empty *p2 = new Empty;
+    if (p1 == p2)
+        cout << "impossible: report error to compiler supplier";
+}
+
+struct X : Empty
+{
+    int a;
+    // ...
+};
+
+void f(X *p)
+{
+    void *p1 = p;
+    void *p2 = &p->a;
+    if (p1 == p2)
+        cout << "nice: good optimizer\n";
+}
+
+class B
+{
+public:
+    int f(int i)
+    {
+        cout << "f(int): ";
+        return i;
+    }
+    // ...
+};
+
+class D : public B
+{
+public:
+    using B::f; // make every f from B available
+    double f(double d)
+    {
+        cout << "f(double): ";
+        return d;
+    }
+    // ...
+};
+
+void empty_class_test()
+{
+    FUNC_HEAD();
+    f();
+    struct X b;
+    f(&b);
+
+    D *pd = new D;
+    cout << pd->f(2) << '\n';
+    cout << pd->f(2.3) << '\n';
+}
+
 int main()
 {
     static_method_field();
     virtual_test();
     friend_test();
     operator_test();
+    empty_class_test();
     return 0;
 }
