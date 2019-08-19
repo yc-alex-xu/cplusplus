@@ -1,5 +1,6 @@
 /*
 for  gcc version 4.9.2 
+valid for not ulca situation
 g++ -Wall (-DDEBUG) -static -std=c++11 -o logB
 */
 
