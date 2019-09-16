@@ -1,5 +1,5 @@
 /*
-g++ -Wall -static -std=c++14  -lpthread 
+g++ -Wall -std=c++14  -lpthread 
 */
 #include <fstream>
 #include <iostream>
@@ -27,7 +27,7 @@ int progress_udpate()
         if (!bPrompt)
             break;
         cerr << "\b" << spin[count++ % 4];
-        this_thread::sleep_for(40ms);
+        this_thread::sleep_for(40ms); // 25 frames per second
     }
     return 0;
 }
@@ -45,9 +45,7 @@ string scan_item(string &line, string pat)
 {
     auto n1 = line.find(pat);
     if (n1 == string::npos)
-    {
-        return ""; //can't find the pattern
-    }
+        return "";                         //can't find the pattern
     return line.substr(n1 + pat.length()); //till end of line
 }
 
@@ -66,11 +64,9 @@ void checklog(ifstream &fs_in)
     int cellId;
 
     thread t{progress_udpate};
-
     for (string line; getline(fs_in, line);)
     {
         ++lineno;
-
         if (line.find("UpcDlMacCeFiUlValidationInfoInd") < string::npos)
         {
             b_UpcDlMacCeFiUlValidationInfoInd = true;
@@ -152,7 +148,7 @@ int main(int argc, char *argv[])
     if (argc < 2)
     {
         cerr << "Usage:" << argv[0] << " [dec file]" << endl
-             << "used for statistics for UpcDlMacCeFiUlValidationInfoInd & UpcDlMacCeFiUlSchedInfoInd only" << endl
+             << "used for statistics for Signal UpcDlMacCeFiUlValidationInfoInd & UpcDlMacCeFiUlSchedInfoInd only" << endl
              << "developed  by Xu YangChun" << endl;
         exit(-1);
     }
