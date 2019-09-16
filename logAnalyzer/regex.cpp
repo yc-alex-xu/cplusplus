@@ -11,24 +11,8 @@ $clang++ -g -std=c++11 -stdlib=libc++ -lc++abi regex.cpp
 #include <iostream>
 #include <regex>
 #include <string>
-#include "../toolkit.h"
 
 using namespace std;
-
-/*update the progess to user, e.g. print # every 1000 lines parsed
-*/
-void update_progress(int lineno)
-{
-  static int count = 1;
-  if (lineno > count * 100)
-  {
-    if (count == 1)
-      cerr << endl
-           << "progress:\t";
-    cerr << "#";
-    count++;
-  }
-}
 
 void find_all_pair(ofstream &out, string &input)
 {
@@ -39,17 +23,14 @@ void find_all_pair(ofstream &out, string &input)
   }
 }
 
-int log_filter(ifstream &in, ofstream &out, long &count)
+int log_filter(ifstream &in, ofstream &out)
 {
-  FUNC_HEAD();
-
   regex pat{R"(<!UPCUL.107!> cellId=\d*, (bbUeRef=(\w+)))"};
 
   int lineno = 0;
   string line;
   while (getline(in, line))
   {
-    update_progress(lineno);
     ++lineno;
     smatch matches; // matched strings go here
     if (regex_search(line, matches, pat))
@@ -69,7 +50,7 @@ int main(int argc, char *argv[])
 {
   if (argc < 2)
   {
-    std::cout << "Usage:" << argv[0] << " [FILE] \nused for EBB log verification" << endl;
+    std::cout << "Usage:" << argv[0] << " [FILE] \n";
     exit(-1);
   }
   ifstream in(argv[1]);
@@ -84,13 +65,8 @@ int main(int argc, char *argv[])
   {
     cerr << fn << " open error!" << endl;
   }
-  long count = 0;
-  if (log_filter(in, out, count) < 0)
-    cout << endl
-         << count << " se verified,last one not matched, please check ERROR in " << fn << endl;
-  else
-    cout << endl
-         << count << " se verified,all matched, you can double check in  " << fn << endl;
+  log_filter(in, out);
+  cout << "you can double check in  " << fn << endl;
   in.close();
   out.close();
   return 0;

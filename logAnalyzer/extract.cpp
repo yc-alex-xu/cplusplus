@@ -30,22 +30,6 @@ bool endsWith(string &s, const string &sub)
     return s.rfind(sub) == (s.length() - sub.length()) ? true : false;
 }
 
-
-
-void update_progress(int lineno)
-{
-    static int count = 1;
-    if (lineno > count * 100000)
-    {
-        if (count == 1)
-            cerr << endl
-                 << "progress:\t"; //cerr is not buffered
-        cerr << "#";
-        count++;
-    }
-}
-
-
 int checklog(long &count)
 {
     unsigned long lineno = 0; //without long long, the old gcc can't match stoi
@@ -55,32 +39,31 @@ int checklog(long &count)
     for (string line; count < MAX_SE && getline(fs_in, line);)
     {
         ++lineno;
-        update_progress(lineno);
         if (line.find("<!UPCUL.211!>") < string::npos)
         {
-            fs_out <<lineno<<":"<<line <<endl;
+            fs_out << lineno << ":" << line << endl;
         }
         else if (line.find("<!UPCUL.170!>") < string::npos)
         {
-            fs_out <<lineno<<":"<<line <<endl;
+            fs_out << lineno << ":" << line << endl;
         }
         else if (line.find("<!UPCUL.123!>") < string::npos)
         {
-            fs_out <<lineno<<":"<<line <<endl;
+            fs_out << lineno << ":" << line << endl;
         }
-        else if (endsWith(line,"newTxSeData {"))
+        else if (endsWith(line, "newTxSeData {"))
         {
-            fs_out <<lineno<<":"<<line <<endl;
+            fs_out << lineno << ":" << line << endl;
             count++;
             while (getline(fs_in, line))
             {
                 lineno++;
-                fs_out <<line <<endl;
-                if (endsWith(line,"}"))
+                fs_out << line << endl;
+                if (endsWith(line, "}"))
                 {
                     break;
                 }
-            }//while
+            } //while
         }
         else
         {
@@ -94,7 +77,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        cerr << "Usage:" << argv[0] << " [FILE] \nused for EBB log verification \ndeveloped  by Alex" << endl;
+        cerr << "Usage:" << argv[0] << " [FILE] \n extract the log interested in" << endl;
         exit(-1);
     }
     fs_in.open(argv[1]);
@@ -111,12 +94,10 @@ int main(int argc, char *argv[])
         exit(-3);
     }
     long count = 0;
-    if (checklog(count) < 0)
-        cout << endl
-             << count << " se verified,last one not matched " << endl;
-    else
-        cout << endl
-             << count << " se verified,all matched" << endl;
+    checklog(count);
+
+    cout << endl
+         << count << " se found" << endl;
     cout << "please double check via " << fn << endl;
 
     fs_in.close();

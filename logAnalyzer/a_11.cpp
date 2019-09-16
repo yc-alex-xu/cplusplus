@@ -1,15 +1,15 @@
 /*
 for  gcc version 4.9.2 
-g++ -Wall (-DDEBUG) -static -std=c++11 -o logA  a_11.cpp  
+g++ -Wall -std=c++11
 */
-
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <map>
-
 using namespace std;
 
+/*data type
+*/
 struct UPCUL_107
 {
   int bbUeRef;
@@ -30,10 +30,12 @@ struct SE_IUA
   int iuaTbs; //bytes
 };
 
+/*global variable
+*/
 ifstream fs_in;
 ofstream fs_out;
 
-//return a copy
+//return xvalue(expiring value)
 string scan_item(string &line, string pat, string ending = " ")
 {
   string::size_type n1, n2;
@@ -82,9 +84,9 @@ bool trace_matched(SE_IUA &se, UPCUL_107 &trace)
 }
 
 /*
-comapre the trace with golden
-if matched return 0;
-else if preceeding trace missing return >0
+comapre the trace with SE
+return 0 if matched ;
+return >0 if preceeding trace missing 
 else <0
 */
 inline int compare_trace(string &str_se_info, map<int, string> &map_trace)
@@ -107,23 +109,7 @@ inline int compare_trace(string &str_se_info, map<int, string> &map_trace)
   }
   else
   {
-#ifdef DEBUG
-    fs_out << "can't found " << se.bbUeRef << endl;
-#endif
     return 1;
-  }
-}
-
-inline void update_progress(int lineno)
-{
-  static int count = 1;
-  if (lineno > count * 100000)
-  {
-    if (count == 1)
-      cerr << endl
-           << "progress:\t"; //cerr is not buffered
-    cerr << "#";
-    count++;
   }
 }
 
@@ -134,22 +120,17 @@ bool read_se(string &str_se_info, int &lineno)
   bool b_se_found = false;
   string pat_se_type = "iuaImplicitTxSeData";
   string pat_se_end = "}";
+
   while (getline(fs_in, line))
   {
     lineno++;
     str_se_info += line + "\n";
     if (line.find(pat_se_type) < string::npos)
     {
-#ifdef DEBUG
-      fs_out << "------> iua found" << endl;
-#endif
       b_se_found = true;
     }
     else if (line.find(pat_se_end) < string::npos)
     {
-#ifdef DEBUG
-      fs_out << "------>end of  iua found" << endl;
-#endif
       break;
     }
   }
@@ -166,24 +147,13 @@ int checklog(long &count)
   for (string line; (status >= 0) && getline(fs_in, line);)
   {
     ++lineno;
-    update_progress(lineno);
-#ifdef DEBUG
-    fs_out << lineno << endl
-           << line << endl;
-#endif
     if (line.find(pat_trace) < string::npos) //trace line met
     {
       int bbUeRef = stoi(scan_item(line, "bbUeRef="), 0, 16);
-#ifdef DEBUG
-      fs_out << "------> trace found" << bbUeRef << endl;
-#endif
       map_trace[bbUeRef] = to_string(lineno) + ":" + line + "\n";
     }
     else if (line.find("seSchedInfoList {") < string::npos) //line such as "bbUeRef 16777216" met
     {
-#ifdef DEBUG
-      fs_out << "------> bbUeRef found" << endl;
-#endif
       string str_se_info = to_string(lineno) + ":" + line + "\n";
       if (read_se(str_se_info, lineno))
       {
@@ -204,7 +174,9 @@ int main(int argc, char *argv[])
 {
   if (argc < 2)
   {
-    cerr << "Usage:" << argv[0] << " [FILE] \nused for EBB log verification \ndeveloped  by Alex" << endl;
+    cerr << "Usage:" << argv[0] << " [FILE] \n"
+         << "used for EBB IUA implicit grant log verification" << endl
+         << "developed  by Xu YangChun" << endl;
     exit(-1);
   }
   fs_in.open(argv[1]);
@@ -228,7 +200,6 @@ int main(int argc, char *argv[])
     cout << endl
          << count << " se verified,all matched" << endl;
   cout << "please double check via " << fn << endl;
-
   fs_in.close();
   fs_out.close();
   return 0;
