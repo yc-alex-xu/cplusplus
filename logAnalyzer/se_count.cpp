@@ -20,11 +20,10 @@ ostream &operator<<(ostream &os, const map<T1, T2> &m)
 //return xvalue(expiring value), not a copy
 string scan_item(string &line, string pat)
 {
-    string::size_type n1;
-    n1 = line.find(pat);
+    auto n1 = line.find(pat);
     if (n1 == string::npos)
     {
-        return "";
+        return ""; //can't find the pattern
     }
     return line.substr(n1 + pat.length()); //till end of line
 }
@@ -72,8 +71,7 @@ void checklog(ifstream &fs_in)
             else
             {
                 cerr << "lineno\t" << lineno << endl
-                     << "cellId:"
-                     << "  appeared in unexpected place" << endl;
+                     << "cellId: appeared in unexpected place" << endl;
                 exit(-3);
             }
         }
@@ -127,7 +125,7 @@ int main(int argc, char *argv[])
     {
         cerr << "Usage:" << argv[0] << " [dec file]" << endl
              << "used for statistics for UpcDlMacCeFiUlValidationInfoInd & UpcDlMacCeFiUlSchedInfoInd only" << endl
-             << "developed  by Alex" << endl;
+             << "developed  by Xu YangChun" << endl;
         exit(-1);
     }
     ifstream fs_in(argv[1]);
