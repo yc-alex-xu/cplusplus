@@ -1,13 +1,36 @@
 /*
-g++ -Wall -static -std=c++11 -o se_count.exe
+g++ -Wall -static -std=c++14  -lpthread 
 */
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <map>
+#include <chrono>
+#include <thread>
 using namespace std;
 
+/* data type
+*/
 using MAP = map<int, int>;
+
+/* global variable
+*/
+bool bPrompt = true;
+
+int progress_udpate()
+{
+    int count = 0;
+    const char spin[] = "|/-\\";
+    cerr << "progress: ";
+    for (;;)
+    {
+        if (!bPrompt)
+            break;
+        cerr << "\b" << spin[count++ % 4];
+        this_thread::sleep_for(40ms);
+    }
+    return 0;
+}
 
 template <typename T1, typename T2>
 ostream &operator<<(ostream &os, const map<T1, T2> &m)
@@ -40,8 +63,9 @@ void checklog(ifstream &fs_in)
     MAP count_newTxSeData;
     MAP count_nonAdaptReTxSeData;
     MAP count_adaptReTxSeData;
-
     int cellId;
+
+    thread t{progress_udpate};
 
     for (string line; getline(fs_in, line);)
     {
@@ -70,6 +94,8 @@ void checklog(ifstream &fs_in)
             }
             else
             {
+                bPrompt = false;
+                t.join();
                 cerr << "lineno\t" << lineno << endl
                      << "cellId: appeared in unexpected place" << endl;
                 exit(-3);
@@ -100,6 +126,8 @@ void checklog(ifstream &fs_in)
         }
     } //for
 
+    bPrompt = false;
+    t.join();
     cout << endl
          << "UpcDlMacCeFiUlSchedInfoInd \t" << endl
          << count_UpcDlMacCeFiUlSchedInfoInd << endl
