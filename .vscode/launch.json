@@ -10,9 +10,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "a.out",
-            "args": ["newTx.log"],
+            "args": ["BB.dec"],
             "stopAtEntry": false,
-            "cwd": "/mnt/c/base/cplusplus/concurrency",
+            "cwd": "/mnt/c/base/cplusplus/logAnalyzer",
             "environment": [],
             "externalConsole": false,
             "sourceFileMap": {
