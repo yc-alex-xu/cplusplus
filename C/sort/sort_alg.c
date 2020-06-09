@@ -1,37 +1,60 @@
-#include <stdio.h>
-#include "toolkit.h"
-void print_array(char *str, int a[], int n)
+//后边先有序
+void bubble_sort(int arr[], int len)
 {
-    printf("%s:\n", str);
-    for (int i = 0; i < n; i++)
+    for (int i = len - 1; i > 0; i--)
     {
-        printf("%4d", a[i]);
+        int changed = 0;
+        for (int j = 0; j < i; j++)
+        {
+            if (arr[j] > arr[j + 1])
+            {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                changed = 1;
+            }
+        }
+        if (!changed)
+            break;
     }
-    printf("\n");
+}
+//前边先有序,但不能保证前面的就是最小的
+void insertion_sort(int arr[], int len)
+{
+    int i, j, temp;
+    for (i = 1; i < len; i++)
+    { //前提，a[i] 之前是有序的，因为a[0]可以理解为一个元素组成的队伍，自然是有序的，不需要搞插入了
+        temp = arr[i];//让arr[i]前的i个元素空出一个位置
+        for (j = i; j > 0 &&arr[j - 1] > temp ; j--) //j代表的是被插的队伍
+                arr[j] = arr[j - 1]; //小于我的都后退
+        arr[j] = temp;//如果实际没有回退过，
+    }
 }
 
-void bubble_test(int a[], int n)
+int fab(int n)
 {
-    FUNC_HEAD();
-    print_array("before sort:", a, n);
-
-    int i, j, t;
-    for (i = n-1; i >0; i--)
-        for (j = 0; j < i; j++)
-            if (a[j] > a[j + 1])
-            {
-                t = a[j];
-                a[j] = a[j + 1];
-                a[j + 1] = t;
-            }
-
-    print_array("after sort:", a, n);
+    if (n<=2) {
+        return 1;
+    }
+    else
+    {
+        return fab(n-1)+fab(n-2);
+    }
+    
 }
 
 int main()
 {
-    int a[10] = {12, 45, 7, 8, 96, 4, 10, 48, 2, 46};
-    bubble_test(a, 10);
+    int arr[] = {22, 34, 3, 32, 82, 55, 89, 50, 37, 5, 64, 35, 9, 70};
+    int len = (int)sizeof(arr) / sizeof(arr[0]);
+    insertion_sort(arr, len);
+    for (int i = 0; i < len; i++)
+        printf("%d ", arr[i]);
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("fab[%d]=%d\n",i,fab(i));
+    }
 
     return 0;
 }
