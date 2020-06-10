@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 	char line[MAXLINE];
 	for (;;)
 	{
-		int nEvents = epoll_wait(epfd, events, MAXEVENTS-1, 500);
+		int nEvents = epoll_wait(epfd, events, MAXEVENTS - 1, 500);
 
 		for (int i = 0; i < nEvents; ++i)
 		{
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 					perror("fdClient < 0");
 					exit(1);
 				}
-				printf("accept connection fd=%d\n", fdClient);
+				printf("accept client fd=%d\n", fdClient);
 				setnonblocking(fdClient);
 
 				char *str = inet_ntoa(clientaddr.sin_addr);
@@ -148,13 +148,15 @@ int main(int argc, char *argv[])
 				int fd = events[i].data.fd;
 				if (fd < 0)
 					continue;
-				ssize_t n = read(fd, line, MAXLINE);	
+				ssize_t n = read(fd, line, MAXLINE);
 				if (n < 0)
 				{
 					if (errno == ECONNRESET)
 					{
 						close(fd);
 						events[i].data.fd = -1;
+						epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
+						printf("reset from  fd=%d\n", fd);
 					}
 					else
 					{
@@ -165,13 +167,18 @@ int main(int argc, char *argv[])
 				{
 					close(fd);
 					events[i].data.fd = -1;
+					epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
+					printf("FIN from  fd=%d\n", fd);
 				}
-				line[n]='\0';
-				printf("received data: %s\n", line);
+				else
+				{
+					line[n] = '\0';
+					printf("received data: %s\n", line);
 
-				ev.data.fd = fd;
-				ev.events = EPOLLOUT | EPOLLET;
-				epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
+					ev.data.fd = fd;
+					ev.events = EPOLLOUT | EPOLLET;
+					epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
+				}
 			}
 			else if (events[i].events & EPOLLOUT)
 			{
