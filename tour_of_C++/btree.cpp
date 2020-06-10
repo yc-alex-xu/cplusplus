@@ -1,11 +1,10 @@
 #include <iostream>
 using namespace std;
 
-/** node DS */
 typedef struct node
 {
 	int key;
-	node *left,*right;
+	node *left, *right;
 } node;
 
 int findRoot(int A[], int begin, int end, int key)
@@ -29,36 +28,34 @@ node *buildTree(int *PreOrder, int pbegin, int pend,
 	if (pbegin >= pend || ibegin >= iend)
 		return NULL; // 出口, 无节点情况
 
-	node *pRoot = new node{PreOrder[pbegin], NULL, NULL}; // 构造根节点
+	node *r = new node{PreOrder[pbegin], NULL, NULL}; // 构造根节点
 
-	int r = findRoot(InOrder, ibegin, iend, PreOrder[pbegin]); // root's position in InOrder
-
+	int idx = findRoot(InOrder, ibegin, iend, PreOrder[pbegin]); // root's position in InOrder
+	int sizeLeft = idx - ibegin;
 	// 确定左子树、右子树 前序、中序遍历结果, 递归求解 */
-	pRoot->left = buildTree(PreOrder, pbegin + 1, (r - ibegin) + pbegin + 1, InOrder, ibegin, r);
-	pRoot->right = buildTree(PreOrder, (r - ibegin) + pbegin + 1, pend, InOrder, r + 1, iend);
-	cout << "root:" << PreOrder[pbegin] << endl;
-
-	return pRoot;
+	r->left = buildTree(PreOrder, pbegin + 1, sizeLeft + pbegin + 1, InOrder, ibegin, idx);
+	r->right = buildTree(PreOrder, sizeLeft + pbegin + 1, pend, InOrder, idx + 1, iend);
+	return r;
 }
 
-/** 中序遍历 */
-void inOrderTraverse(node *pRoot)
+void traverse(node *r)
 {
-	if (pRoot == NULL)
+	if (r == NULL)
 		return;
 
-	cout << "key:" << pRoot->key << endl;
-	if (pRoot->left != NULL)
+	cout << "key:" << r->key << "\t";
+	if (r->left != NULL)
 	{
-		cout << pRoot->key << "left===>" << pRoot->left->key << endl;
-		inOrderTraverse(pRoot->left);
+		cout<< "left===>" << r->left->key;
 	}
 
-	if (pRoot->right != NULL)
+	if (r->right != NULL)
 	{
-		cout << pRoot->key << "right===>" << pRoot->right->key << endl;
-		inOrderTraverse(pRoot->right);
+		cout<< "\tright===>" << r->right->key;
 	}
+	cout << endl;
+	traverse(r->left);
+	traverse(r->right);
 }
 
 int main()
@@ -67,8 +64,8 @@ int main()
 	int InOrder[] = {8, 12, 16, 32, 35, 43, 56, 78, 83, 88, 97, 121};
 
 	int len = sizeof(PreOrder) / sizeof(PreOrder[0]);
-	node *pRoot = buildTree(PreOrder, 0, len, InOrder, 0, len);
-	//inOrderTraverse(pRoot);
+	node *r = buildTree(PreOrder, 0, len, InOrder, 0, len);
+	traverse(r);
 
 	return 0;
 }
