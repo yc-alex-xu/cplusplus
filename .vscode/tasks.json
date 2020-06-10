@@ -12,7 +12,7 @@
                 "-g",
                 "-pthread",
                 "${file}",
-                "-o${fileBasenameNoExtension}.exe"
+                "-obin/${fileBasenameNoExtension}.exe"
             ],
             "group": {
                 "kind": "build",
@@ -20,15 +20,5 @@
             },
             "problemMatcher": []
         },
-        {
-            "label": "make",
-            "type": "shell",
-            "command": "cd ${fileDirname};make  -f ../Makefile",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": []
-        }
     ]
 }
