@@ -6,24 +6,16 @@
     "configurations": [
         
         {
-            "name": "(gdb) Bash on Windows Launch",
+            "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "a.out",
-            "args": ["BB.dec"],
+            "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
+            "args": [],
             "stopAtEntry": false,
-            "cwd": "/mnt/c/base/cplusplus/logAnalyzer",
+            "cwd": "${workspaceFolder}/algo",
             "environment": [],
             "externalConsole": false,
-            "sourceFileMap": {
-                "/mnt/c/": "C:\\"
-            },
-            "pipeTransport": {
-                "debuggerPath": "/usr/bin/gdb",
-                "pipeProgram": "${env:windir}\\system32\\bash.exe",
-                "pipeArgs": ["-c"],
-                "pipeCwd": ""
-            },
+            "MIMode": "gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -31,7 +23,8 @@
                     "ignoreFailures": true
                 }
             ]
-        }
+        },
+        
         
     ]
 }
