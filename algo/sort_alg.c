@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 //后边先有序
 void bubble_sort(int arr[], int len)
 {
