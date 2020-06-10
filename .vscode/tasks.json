@@ -5,20 +5,18 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "file",
-            "command": "g++",
-            "args": [
-                "-v",
-                "-g",
-                "-pthread",
-                "${file}",
-                "-obin/${fileBasenameNoExtension}.exe"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": []
+        "type": "shell",
+        "label": "g++ build active file",
+        "command": "/usr/bin/g++",
+        "args": ["-g", "-pthread","${file}", "-o", "bin/${fileBasenameNoExtension}"],
+        "options": {
+          "cwd": "${workspaceFolder}"
         },
+        "problemMatcher": ["$gcc"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      }    
     ]
 }
