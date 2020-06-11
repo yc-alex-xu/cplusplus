@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 			{
 				int fd = events[i].data.fd;
 				write(fd, buf, strlen(buf));
-				buf[0]='\0';
+				buf[0] = '\0';
 				perror("write");
 			}
 		}
