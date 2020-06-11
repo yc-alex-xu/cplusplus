@@ -1,6 +1,6 @@
 /*
 a simple echo server
-$gcc -g epoll.c 
+$g++ -g epoll.c 
 $./a.out
 then start multiple telnet to test
 $ telnet 127.0.0.1  8000
@@ -62,11 +62,8 @@ ET模式仅当状态发生变化的时候才获得通知,这里所谓的状态�
 #include <stdlib.h>
 #include <string.h>
 
-#define MAXLINE 10
-#define OPEN_MAX 100
 #define LISTENQ 20
 #define SERV_PORT 8000
-#define INFTIM 1000
 
 void setnonblocking(int sock)
 {
@@ -90,106 +87,98 @@ void setnonblocking(int sock)
 
 int main(int argc, char *argv[])
 {
-	int fdSrv = socket(AF_INET, SOCK_STREAM, 0);
-	setnonblocking(fdSrv);
+	int sockSrv = socket(AF_INET, SOCK_STREAM, 0);
+	perror("create socket");
+	setnonblocking(sockSrv);
 
 	//add a event
 	struct epoll_event ev;
-	ev.data.fd = fdSrv;
+	ev.data.fd = sockSrv;
 	ev.events = EPOLLIN | EPOLLET;
 	int epfd = epoll_create(256);
-	epoll_ctl(epfd, EPOLL_CTL_ADD, fdSrv, &ev);
+	epoll_ctl(epfd, EPOLL_CTL_ADD, sockSrv, &ev);
 
 	//server address
 	struct sockaddr_in serveraddr;
 	bzero(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	char *local_addr = "127.0.0.1";
-	inet_aton(local_addr, &(serveraddr.sin_addr));
+	inet_aton("127.0.0.1", &(serveraddr.sin_addr));
 	serveraddr.sin_port = htons(SERV_PORT);
 
-	bind(fdSrv, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
+	bind(sockSrv, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
+	perror("bind");
 
-	listen(fdSrv, LISTENQ);
+	listen(sockSrv, LISTENQ);
+	perror("srv listen");
 	printf("epoll echo server listending on port %d \n", SERV_PORT);
 
 #define MAXEVENTS 20
 	struct epoll_event events[MAXEVENTS];
-	char line[MAXLINE];
+	char buf[200] = "\0";
 	for (;;)
 	{
 		int nEvents = epoll_wait(epfd, events, MAXEVENTS - 1, 500);
-
-		for (int i = 0; i < nEvents; ++i)
+		perror("epoll_wait");
+		printf("%d event happen!\n", nEvents);
+		for (int i = 0; i < nEvents; i++)
 		{
-			if (events[i].data.fd == fdSrv)
+			if (events[i].data.fd == sockSrv)
 			{
 				struct sockaddr_in clientaddr;
 				socklen_t clilen;
-				int fdClient = accept(fdSrv, (struct sockaddr *)&clientaddr, &clilen);
-				if (fdClient < 0)
+				int sockCli = accept(sockSrv, (struct sockaddr *)&clientaddr, &clilen);
+				perror("accept");
+				if (sockCli < 0)
 				{
-					perror("fdClient < 0");
+					perror("sockCli < 0");
 					exit(1);
 				}
-				printf("accept client fd=%d\n", fdClient);
-				setnonblocking(fdClient);
+				printf("accept client fd=%d\n", sockCli);
+				setnonblocking(sockCli);
 
 				char *str = inet_ntoa(clientaddr.sin_addr);
 				printf("connect from %s\n", str);
 
 				//add socket of new connection
-				ev.data.fd = fdClient;
-				ev.events = EPOLLIN | EPOLLET;
-				epoll_ctl(epfd, EPOLL_CTL_ADD, fdClient, &ev);
+				ev.data.fd = sockCli;
+				ev.events = EPOLLIN | EPOLLET | EPOLLOUT;
+				epoll_ctl(epfd, EPOLL_CTL_ADD, sockCli, &ev);
+				perror("epoll_ctl add");
+				continue;
 			}
-			else if (events[i].events & EPOLLIN)
+			if (events[i].events & EPOLLIN)
 			{
 				int fd = events[i].data.fd;
 				if (fd < 0)
 					continue;
-				ssize_t n = read(fd, line, MAXLINE);
-				if (n < 0)
+
+				ssize_t readval;
+				readval = read(fd, buf, sizeof(buf)); //实际每个fd应该有自己的inBuffer,outBuffer
+				perror("read");
+				printf("received data: %s\n", buf);
+
+				if (readval < 0)
 				{
 					if (errno == ECONNRESET)
 					{
 						close(fd);
 						events[i].data.fd = -1;
 						epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
-						printf("reset from  fd=%d\n", fd);
-					}
-					else
-					{
-						printf("readline error");
 					}
 				}
-				else if (n == 0)
+				else if (readval == 0)
 				{
 					close(fd);
 					events[i].data.fd = -1;
 					epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
 					printf("FIN from  fd=%d\n", fd);
 				}
-				else
-				{
-					line[n] = '\0';
-					printf("received data: %s\n", line);
-
-					ev.data.fd = fd;
-					ev.events = EPOLLOUT | EPOLLET;
-					epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
-				}
 			}
-			else if (events[i].events & EPOLLOUT)
+			if (events[i].events & EPOLLOUT && buf[0] != '\0')
 			{
 				int fd = events[i].data.fd;
-				write(fd, line, strlen(line));
-
-				printf("written data: %s\n", line);
-
-				ev.data.fd = fd;
-				ev.events = EPOLLIN | EPOLLET;
-				epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
+				write(fd, buf, strlen(buf));
+				perror(buf);
 			}
 		}
 	}
