@@ -6,6 +6,8 @@ then start multiple telnet to test
 $ telnet 127.0.0.1  8000
 Trying 127.0.0.1...
 Connected to 127.0.0.1.
+
+ctrl+]: enter telnet cmd mode
 */
 /* 
 epoll的接口非常简单，一共就三个函数：
@@ -49,6 +51,13 @@ EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果�
 可以得出这样的结论:
 ET模式仅当状态发生变化的时候才获得通知,这里所谓的状态的变化并不包括缓冲区中还有未处理的数据,也就是说,如果要采用ET模式,
 需要一直read/write直到出错为止,很多人反映为什么采用ET模式只接收了一部分数据就再也得不到通知了,大多因为这样;而LT模式是只要有数据没有处理就会一直通知下去的.
+
+*/
+/*
+todo:
+1. 增加对ctrl-c的处理，close epoll fd
+
+
 */
 
 #include <sys/socket.h>
@@ -112,12 +121,12 @@ int main(int argc, char *argv[])
 	perror("srv listen");
 	printf("epoll echo server listending on port %d \n", SERV_PORT);
 
-#define MAXEVENTS 20
-	struct epoll_event events[MAXEVENTS];
+	struct epoll_event events[20];
 	char buf[200] = "\0";
+	int max = sizeof(events) / sizeof(events[0]);
 	for (;;)
 	{
-		int nEvents = epoll_wait(epfd, events, MAXEVENTS - 1, 500);
+		int nEvents = epoll_wait(epfd, events, max, 500);
 		perror("epoll_wait");
 		printf("%d event happen!\n", nEvents);
 		for (int i = 0; i < nEvents; i++)
@@ -161,24 +170,27 @@ int main(int argc, char *argv[])
 				{
 					if (errno == ECONNRESET)
 					{
+						epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+						perror("EPOLL_CTL_DEL");
 						close(fd);
-						events[i].data.fd = -1;
-						epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
+						continue;
 					}
 				}
 				else if (readval == 0)
 				{
+					epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+					perror("EPOLL_CTL_DEL");
 					close(fd);
-					events[i].data.fd = -1;
-					epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
 					printf("FIN from  fd=%d\n", fd);
+					continue;
 				}
 			}
 			if (events[i].events & EPOLLOUT && buf[0] != '\0')
 			{
 				int fd = events[i].data.fd;
 				write(fd, buf, strlen(buf));
-				perror(buf);
+				buf[0]='\0';
+				perror("write");
 			}
 		}
 	}
