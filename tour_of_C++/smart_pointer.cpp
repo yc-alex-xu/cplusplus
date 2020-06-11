@@ -195,12 +195,10 @@ int weak_ptr2_test()
 
 int main()
 {
+    unique_ptr_test();
     shared_ptr_test();
     shared_ptr_reset_test();
     shared_ptr2_test();
-
-    unique_ptr_test();
-
     weak_ptr_test();
     weak_ptr2_test();
 

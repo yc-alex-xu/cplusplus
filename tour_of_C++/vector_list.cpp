@@ -1,7 +1,6 @@
 #include <iostream>
 #include <list>
 #include <vector>
-#include <algorithm>
 #include "toolkit.h"
 using namespace std;
 
@@ -29,10 +28,10 @@ void vec_list_test()
   cout << "vector:";
   for (auto i : v)
     cout << i << " ";
-  cout << endl;
-  cout << "first itertor point to:" << *(v.begin()) << endl;
-  cout << "last iterator point to:" << *(v.end() - 1) << endl;
-  cout << "3rd itertor point to:" << *(v.begin() + 2) << endl;
+  cout << "\nitertor 1st:" << *(v.begin()) << " 3rd:" << *(v.begin() + 2) << " last :" << *(v.end() - 1) << endl;
+  const int s1 = sum(v); // OK: evaluated at run time
+  cout << "sum: " << s1 << endl;
+  // constexpr int s3 = sum(v); // error : sum(v) not constant expression
 
   list<int>::iterator itl = l.begin();
   // list::iterator中重载了++，只能使用++进行迭代访问。
@@ -40,10 +39,6 @@ void vec_list_test()
   for (; itl != l.end(); itl++)
     cout << *itl << " ";
   cout << endl;
-
-  const int s1 = sum(v); // OK: evaluated at run time
-  cout << "the sum of vector is: " << s1 << endl;
-  // constexpr int s3 = sum(v); // error : sum(v) not constant expression
 }
 
 int main()
