@@ -3,21 +3,6 @@
 #include "toolkit.h"
 using namespace std;
 
-void foo(shared_ptr<int> i)
-{
-    (*i)++;
-}
-void shared_ptr_test()
-{
-    FUNC_HEAD();
-    // auto pointer = new int (10) ; // 非法, 不允许直接赋值
-    // 构造了一个 shared_ptr
-    auto pointer = make_shared<int>(10);
-    foo(pointer);
-    cout << *pointer << endl; // 11
-    // 离开作用域前， shared_ptr 会被析构， 从而释放内存
-}
-
 void shared_ptr_reset_test()
 {
     FUNC_HEAD();
@@ -196,7 +181,6 @@ int weak_ptr2_test()
 int main()
 {
     unique_ptr_test();
-    shared_ptr_test();
     shared_ptr_reset_test();
     shared_ptr2_test();
     weak_ptr_test();

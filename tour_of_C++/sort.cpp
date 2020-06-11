@@ -4,6 +4,7 @@ using namespace std;
 //后边先有序
 void bubbleSort(int arr[], int len)
 {
+    //一开始用来上浮的空间是len-1
     for (int i = len - 1; i > 0; i--)
     {
         int changed = 0;
