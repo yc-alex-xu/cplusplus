@@ -11,7 +11,7 @@ Vector_container::Vector_container(int s)
     : elem{new double[s]},
       sz{s} // initialize members
 {
-  for (auto i = 0; i < sz; i++)
+  for (int i = 0; i < sz; i++)
     elem[i] = 0;
 }
 
@@ -21,6 +21,7 @@ Vector_container::Vector_container(std::initializer_list<double> l)
   copy(l.begin(), l.end(), elem);
 }
 
+//copy constructor
 Vector_container::Vector_container(const Vector_container &a)
 {
   sz = a.sz;
@@ -28,14 +29,16 @@ Vector_container::Vector_container(const Vector_container &a)
   for (auto i = 0; i < sz; i++)
     elem[i] = a.elem[i];
 }
+
+//move constructor
 Vector_container::Vector_container(Vector_container &&a)
     : elem{a.elem}, sz(a.sz)
 {
   a.sz = 0;
   a.elem = nullptr;
 }
-
-Vector_container &Vector_container::operator=(const Vector_container &a) //copy
+//copy assignment
+Vector_container &Vector_container::operator=(const Vector_container &a)
 {
   if (sz > 0)
   {
@@ -48,9 +51,9 @@ Vector_container &Vector_container::operator=(const Vector_container &a) //copy
   return *this; //*this
 }
 
-Vector_container &Vector_container::operator=(Vector_container &&a) //move
+//move assignment
+Vector_container &Vector_container::operator=(Vector_container &&a)
 {
-  cout << "move construction called" << endl;
   if (sz > 0)
     delete[] elem;
   sz = a.sz;
@@ -60,6 +63,7 @@ Vector_container &Vector_container::operator=(Vector_container &&a) //move
   return *this;
 }
 
+//deconstructor
 Vector_container::~Vector_container()
 {
   if (sz > 0)
@@ -71,7 +75,6 @@ Vector_container::~Vector_container()
 
 double &Vector_container::operator[](int i)
 {
-
   if (i >= 0 && i < sz)
     return elem[i];
   else
@@ -82,8 +85,7 @@ int Vector_container::size() const { return sz; }
 void Vector_container::push_back(double d)
 {
   double *p = new double[sz + 1];
-
-  for (auto i = 0; i < sz; i++)
+  for (int i = 0; i < sz; i++)
     p[i] = elem[i];
   p[sz] = d;
   if (sz > 0)
