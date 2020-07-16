@@ -123,6 +123,29 @@ void swap(float *a, float *b)
   *b = temp;
 }
 
+class B
+{
+public:
+  int f(int i)
+  {
+    cout << "B::f(int): ";
+    return i;
+  }
+  // ...
+};
+
+class D : public B
+{
+public:
+  using B::f; // make every f from B available
+  double f(double d)
+  {
+    cout << "D::f(double): ";
+    return d;
+  }
+  // ...
+};
+
 void overload_test()
 {
   int i1 = 1, i2 = 2;
@@ -135,6 +158,11 @@ void overload_test()
   cout << "after swap" << endl;
   cout << i1 << "\t" << i2 << endl;
   cout << f1 << "\t" << f2 << endl;
+
+  //虽然这不能算overload,但从效果来看，也起了类似效果
+  D *pd = new D;
+  cout << pd->f(2) << '\n';
+  cout << pd->f(2.3) << '\n';
 }
 
 int main()

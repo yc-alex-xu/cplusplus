@@ -29,9 +29,13 @@ void struct_class_test()
 class Account
 {
 private:
+    //static 成员变量属于类，不属于某个具体的对象，即使创建多个对象，也只为它分配一份内存
     static double m_rate;
 
 public:
+    //编译器在编译一个普通成员函数时，会隐式地增加一个形参 this，并把当前对象的地址赋值给 this
+    //而静态成员函数可以通过类来直接调用，编译器不会为它增加形参 this，只能访问静态成员
+    //它不需要当前对象的地址，所以不管有没有创建对象，都可以调用静态成员函数。
     static void set_rate(const double &x)
     {
         cout << "old rate = " << m_rate << " new rate = " << x << endl;
@@ -43,8 +47,9 @@ double Account::m_rate = 8.0;
 void static_test()
 {
     FUNC_HEAD();
-    Account a;
+    //static方法，不需要实例化即可调用
     Account::set_rate(5.0);
+    Account a;
     a.set_rate(7.0);
 }
 
@@ -56,24 +61,27 @@ void static_test()
 class a
 {
 public:
-    a() { cout << "a" << endl; }
-    virtual void disp() { cout << "a disp" << endl; }
-    virtual ~a() { cout << "~a" << endl; }
+    //在C++中，有一种特殊的成员函数，它的名字和类名相同，没有返回值，不需要用户显式调用（用户也不能调用），
+    //而是在创建对象时自动执行。这种特殊的成员函数就是构造函数（Constructor）。
+    a() { cout << "Constructor a" << endl; }
+    virtual void disp() { cout << "a::disp()" << endl; }
+    //析构函数 Destructor 也是一种特殊的成员函数，没有返回值，不需要程序员显式调用（
+    virtual ~a() { cout << "Destructor ~a" << endl; }
 };
 
 class b : public a
 {
 public:
-    b() { cout << "b" << endl; }
-    ~b() { cout << "~b" << endl; }
+    b() { cout << "Constructor b" << endl; }
+    ~b() { cout << "Destructor ~b" << endl; }
 };
 
 class c : public b
 {
 public:
-    c() { cout << "c" << endl; }
-    void disp() { cout << "c:disp" << endl; }
-    ~c() { cout << "~c" << endl; }
+    c() { cout << "Constructor c" << endl; }
+    void disp() { cout << "c::disp()" << endl; }
+    ~c() { cout << "Destructor ~c" << endl; }
 };
 
 /* 
@@ -87,142 +95,6 @@ void virtual_test()
     cout << "call virtual function via object pointer" << endl;
     p->disp();
     delete p; //must free explicitly
-
-    a a_object;
-    cout << "call virtual function via object" << endl;
-    a_object.disp();
-}
-
-class StackIter;
-
-class Stack
-{
-private:
-    int items[10];
-    int sp;
-
-public:
-    friend class StackIter;
-    Stack()
-    {
-        sp = -1;
-    }
-    void push(int in)
-    {
-        items[++sp] = in;
-    }
-    int pop()
-    {
-        return items[sp--];
-    }
-    bool isEmpty()
-    {
-        return (sp == -1);
-    }
-    StackIter *createIterator() const;
-};
-
-class StackIter
-{
-    const Stack *stk;
-    int index;
-
-public:
-    StackIter(const Stack *s)
-    {
-        stk = s;
-    }
-    void first()
-    {
-        index = 0;
-    }
-    void next()
-    {
-        index++;
-    }
-    bool isDone()
-    {
-        return index == stk->sp + 1;
-    }
-    int currentItem()
-    {
-        return stk->items[index];
-    }
-};
-
-StackIter *Stack::createIterator() const
-{
-    return new StackIter(this);
-}
-
-bool operator==(const Stack &l, const Stack &r)
-{
-
-    StackIter *itl = l.createIterator();
-    StackIter *itr = r.createIterator();
-
-    for (itl->first(), itr->first(); !itl->isDone(); itl->next(), itr->next())
-        if (itl->currentItem() != itr->currentItem())
-            break;
-    bool ans = itl->isDone() && itr->isDone();
-    delete itl;
-    delete itr;
-    return ans;
-}
-
-/* 
-the example of friend class
- */
-void friend_test()
-{
-    FUNC_HEAD();
-    Stack s1;
-    for (int i = 1; i < 5; i++)
-        s1.push(i);
-    Stack s2(s1), s3(s1); //no copy construction defined, using default one
-    s3.pop();
-    cout << "s1==s2?: " << (s1 == s2) << endl;
-    /*
-    if not equal, it mean the default copy constuction deep copy the
-       int items[10];
-    */
-    cout << "s1==s3?: " << (s1 == s3) << endl;
-}
-
-struct USCurrency
-{
-    int dollars;
-    int cents;
-    USCurrency operator+(const USCurrency c)
-    {
-        this->cents += c.cents;
-        this->dollars += c.dollars;
-        if (this->cents >= 100)
-        {
-            this->cents -= 100;
-            this->dollars++;
-        }
-        return *this;
-    }
-};
-
-ostream &operator<<(ostream &out, const USCurrency &c)
-{
-    out << "$" << c.dollars << "." << c.cents;
-    return out;
-}
-
-/*
-override the operator  +， <<
- */
-int operator_test()
-{
-    FUNC_HEAD();
-    USCurrency a = {2, 50};
-    USCurrency b = {1, 75};
-    USCurrency c = a + b;
-    cout << c << endl;
-    return 0;
 }
 
 class Empty
@@ -255,28 +127,7 @@ void f(X *p)
         cout << "nice: good optimizer\n";
 }
 
-class B
-{
-public:
-    int f(int i)
-    {
-        cout << "f(int): ";
-        return i;
-    }
-    // ...
-};
 
-class D : public B
-{
-public:
-    using B::f; // make every f from B available
-    double f(double d)
-    {
-        cout << "f(double): ";
-        return d;
-    }
-    // ...
-};
 
 /******
  * 
@@ -289,10 +140,6 @@ void empty_class_test()
     f();
     struct X b;
     f(&b);
-
-    D *pd = new D;
-    cout << pd->f(2) << '\n';
-    cout << pd->f(2.3) << '\n';
 }
 
 class Stack_r
@@ -403,7 +250,8 @@ void polymorphism_test()
     Stack_r s1;
     s1.print();
     GetStack(s1).print();
-    //程序自动调用了带右值引用的拷贝构造函数和赋值运算符重载函数，使得程序的效率得到了很大的提升，因为并没有重新开辟内存拷贝数据。
+    //程序自动调用了带右值引用的拷贝构造函数和赋值运算符重载函数，
+    //使得程序的效率得到了很大的提升，因为并没有重新开辟内存拷贝数据。
     s1 = GetStack(s1);
 }
 
@@ -412,9 +260,6 @@ int main()
     struct_class_test();
     static_test();
     virtual_test();
-    friend_test();
-    operator_test();
     empty_class_test();
-    polymorphism_test();
     return 0;
 }
