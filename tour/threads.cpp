@@ -1,7 +1,6 @@
 /*  $ g++  condition_var.cpp  -lpthread
 
  */
-
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -13,20 +12,19 @@
 using namespace std;
 
 queue<int> products;
-mutex cv_m;
-condition_variable cv_p, cv_c;
+mutex m;
+condition_variable cv_prod, cv_consumer;
 bool done = false;
 
 void producer()
 {
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         cout << " producing " << i << '\n';
         products.push(i);
-        cv_p.notify_one();
-        unique_lock<mutex> lk(cv_m);
-        cv_c.wait_for(lk, 100ms, [] { return false; });
-
+        cv_prod.notify_one();
+        unique_lock<mutex> lk(m);
+        cv_consumer.wait_for(lk, 100ms, [] { return false; });
     }
     done = true;
 }
@@ -35,21 +33,20 @@ void consumer()
 {
     while (!done)
     {
-        unique_lock<mutex> lk(cv_m);
-        cv_p.wait_for(lk, 100ms, [] { return false; });
+        unique_lock<mutex> lk(m);
+        cv_prod.wait_for(lk, 100ms, [] { return false; });
         while (!products.empty())
         {
             cout << " consuming " << products.front() << '\n';
             products.pop();
         }
-        cv_c.notify_one();
+        cv_consumer.notify_one();
     }
 }
 
 void producer_consumer_test()
 {
     FUNC_HEAD();
-
     thread t1(producer);
     thread t2(consumer);
     t1.join();
