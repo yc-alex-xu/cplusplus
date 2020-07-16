@@ -8,7 +8,7 @@ template <typename T>
 T sum(const vector<T> &v) //will not modify its argument
 {
   T sum = 0;
-  for (auto i : v)
+  for (T i : v)
     sum += i;
   return sum;
 }
@@ -28,9 +28,9 @@ void vec_list_test()
   cout << "vector:";
   for (auto i : v)
     cout << i << " ";
-  cout << "\nitertor 1st:" << *(v.begin()) << " 3rd:" << *(v.begin() + 2) << " last :" << *(v.end() - 1) << endl;
+  cout << "\nitertor:\n\t1:" << *(v.begin()) << "\n\t3:" << *(v.begin() + 2) << "\n\tlast:" << *(v.end() - 1) << endl;
   const int s1 = sum(v); // OK: evaluated at run time
-  cout << "sum: " << s1 << endl;
+  cout << "sum:" << s1 << endl;
   // constexpr int s3 = sum(v); // error : sum(v) not constant expression
 
   list<int>::iterator itl = l.begin();
