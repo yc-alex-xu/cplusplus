@@ -9,13 +9,12 @@ void system_test()
 {
     FUNC_HEAD();
     system_clock::period p;
-    cout << "1 tick of system clock=" << p.num << "/" << p.den << " seconds" << endl;
+    cout << "1 tick = " << p.num << "/" << p.den << " seconds" << endl;
 }
 
 void time_points_test()
 {
     FUNC_HEAD();
-
     time_point<system_clock, seconds> tp;
     cout << "to epoch : " << tp.time_since_epoch().count() << " s" << endl;
 }
@@ -23,7 +22,6 @@ void time_points_test()
 void duration_test()
 {
     FUNC_HEAD();
-
     milliseconds mscond(1000); // 1 second
     cout << mscond.count() << " milliseconds.\n";
 
@@ -31,18 +29,18 @@ void duration_test()
     cout << " seconds.\n";
 
     ratio<60, 1> mins;
-    cout << "1 min=" << mins.num << "/" << mins.den << " seconds.\n";
+    cout << "1 min = " << mins.num << "/" << mins.den << "seconds.\n";
 
     milliseconds ms(54802);
     seconds s = duration_cast<seconds>(ms);
-    cout << s.count() << " seconds\n";
+    cout << "ms(54802) = " << s.count() << " seconds\n";
 }
 
 void suffix_test()
 {
     FUNC_HEAD();
     auto t0 = high_resolution_clock::now();
-    cout << "this test will call sleep, so it will take some mins" << endl;
+    cout << "the test will take some time" << endl;
     /*
     常量后缀只是对常量做强制类型转换的语法糖
     C++11 以后对这个语法规则做了扩充，不但扩充了常量前缀（和后缀是一个道理），
@@ -53,8 +51,8 @@ void suffix_test()
     this_thread::sleep_for(10ns); // 休眠 10 纳秒
     this_thread::sleep_for(10us); // 休眠 10 微秒
     this_thread::sleep_for(10ms); // 休眠 10 毫秒
-    this_thread::sleep_for(10s);  // 休眠 10 秒
-    this_thread::sleep_for(1min); // 休眠 1 分钟
+    //this_thread::sleep_for(10s);  // 休眠 10 秒
+    //this_thread::sleep_for(1min); // 休眠 1 分钟
     //this_thread::sleep_for(1h + 10min + 20s); // 休眠 1 小时 10 分钟 20 秒
 
     auto t1 = high_resolution_clock::now();
