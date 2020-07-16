@@ -8,7 +8,7 @@
         "type": "shell",
         "label": "g++ build active file",
         "command": "/usr/bin/g++",
-        "args": ["-g","-fsanitize=leak", "-pthread","${file}", "-o", "bin/${fileBasenameNoExtension}"],
+        "args": ["-g", "-pthread","${file}", "-o", "bin/${fileBasenameNoExtension}"],
         "options": {
           "cwd": "${workspaceFolder}"
         },
