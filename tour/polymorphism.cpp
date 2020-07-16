@@ -2,7 +2,7 @@
 #include "toolkit.h"
 using namespace std;
 
-class Stack_r
+class Stack
 {
 private:
   int *mpstack;
@@ -10,40 +10,38 @@ private:
   int msize;
 
 public:
-  Stack_r(int size = 1000) : msize(size), mtop(0)
+  Stack(int size = 1000) : msize(size), mtop(0)
   {
-    cout << "construction " << endl;
+    cout << "Constructor " << endl;
     mpstack = new int[size];
   }
-  ~Stack_r()
+  ~Stack()
   {
-    cout << "deconstruction" << endl;
+    cout << "Destructor" << endl;
     delete[] mpstack;
     mpstack = nullptr;
   }
 
-  Stack_r(const Stack_r &src) : msize(src.msize), mtop(src.mtop)
+  Stack(const Stack &src) : msize(src.msize), mtop(src.mtop)
   {
-    cout << "copy construction " << endl;
+    cout << "copy Constructor " << endl;
     mpstack = new int[src.msize];
     for (int i = 0; i < mtop; ++i)
     {
       mpstack[i] = src.mpstack[i];
     }
   }
-  Stack_r(Stack_r &&src) : msize(src.msize), mtop(src.mtop)
+  Stack(Stack &&src) : msize(src.msize), mtop(src.mtop)
   {
-    cout << "copy construction with rvalue" << endl;
-
-    /*此处没有重新开辟内存拷贝数据，把src的资源直接给当前对象，再把src置空*/
+    cout << "move Constructor" << endl;
     mpstack = src.mpstack;
     src.mpstack = nullptr;
   }
 
-  // 带右值引用参数的赋值运算符重载函数
-  Stack_r &operator=(Stack_r &&src)
+  // move assignment
+  Stack &operator=(Stack &&src)
   {
-    cout << "operator=(Stack_r &&)" << endl;
+    cout << "operator=(Stack &&)" << endl;
 
     if (this == &src)
       return *this;
@@ -52,16 +50,14 @@ public:
 
     msize = src.msize;
     mtop = src.mtop;
-
-    /*此处没有重新开辟内存拷贝数据，把src的资源直接给当前对象，再把src置空*/
     mpstack = src.mpstack;
     src.mpstack = nullptr;
 
     return *this;
   }
 
-  // 赋值重载
-  Stack_r &operator=(const Stack_r &src)
+  // copy assignment
+  Stack &operator=(const Stack &src)
   {
     cout << "operator=" << endl;
     if (this == &src)
@@ -94,9 +90,9 @@ public:
   }
 };
 
-Stack_r GetStack(Stack_r &s)
+Stack GetStack(Stack &s)
 {
-  Stack_r tmp(s.getSize());
+  Stack tmp(s.getSize());
   return tmp;
 }
 
@@ -107,7 +103,7 @@ here mainly test polymorphism
 void polymorphism_test()
 {
   FUNC_HEAD();
-  Stack_r s1;
+  Stack s1;
   s1.print();
   GetStack(s1).print();
   //程序自动调用了带右值引用的拷贝构造函数和赋值运算符重载函数，
