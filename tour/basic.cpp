@@ -64,14 +64,15 @@ void ds_bias_test()
   cout << "bias " << bias << endl;
 
   bias = (size_t) & (((struc_t *)0)->b);
-  cout << "bias "<< bias << endl;
+  cout << "bias " << bias << endl;
 }
 
 void exception_test()
 {
+  FUNC_HEAD();
   int x = 1;
   int y = 0;
-  FUNC_HEAD();
+
   try
   {
     x /= y;
@@ -82,11 +83,68 @@ void exception_test()
   }
 }
 
+//默认参数只能放在形参列表的最后
+void defaultParam_test(string hi = "Hi", string name = "Alex")
+{
+  FUNC_HEAD();
+  cout << hi << "\t" << name << endl;
+}
+
+/*
+引用可以看做是数据的一个别名，通过这个别名和原来的名字都能够找到这份数据。
+变量 b 就是变量 a 的引用，它们用来指代同一份数据；
+也可以说变量 b 是变量 a 的另一个名字。从输出结果可以看出，a 和 b 的地址一样
+*/
+void reference_test()
+{
+  FUNC_HEAD();
+  int a = 99;
+  //引用必须在定义的同时初始化，并且以后也要从一而终，不能再引用其它数据
+  int &b = a;
+  b = 11;
+  cout << "a:" << a << "\tb:" << b << endl;
+  cout << "address of a:" << &a << endl
+       << "address of b:" << &b << endl;
+}
+
+/*
+Function Overloading。借助重载，一个函数名可以有多种用途。
+*/
+void swap(int *a, int *b)
+{
+  int temp = *a;
+  *a = *b;
+  *b = temp;
+}
+void swap(float *a, float *b)
+{
+  float temp = *a;
+  *a = *b;
+  *b = temp;
+}
+
+void overload_test()
+{
+  int i1 = 1, i2 = 2;
+  float f1 = 1.2, f2 = 2.1;
+  cout << "before swap" << endl;
+  cout << i1 << "\t" << i2 << endl;
+  cout << f1 << "\t" << f2 << endl;
+  swap(&i1, &i2);
+  swap(&f1, &f2);
+  cout << "after swap" << endl;
+  cout << i1 << "\t" << i2 << endl;
+  cout << f1 << "\t" << f2 << endl;
+}
+
 int main()
 {
   type_arithmetic_test();
   data_size_test();
   ds_bias_test();
+  reference_test();
+  defaultParam_test("Hello");
+  overload_test();
   exception_test();
   return 0;
 }
