@@ -37,16 +37,17 @@ void type_arithmetic_test() // function that doesn’t return a value
 void data_size_test()
 {
   FUNC_HEAD();
-  cout << "size of datatype undder current cpu" << endl;
-  cout << sizeof(short) << endl;
-  cout << sizeof(int) << endl; //still 4 bytes as 32bit machine
-  cout << sizeof(long) << endl;
-  cout << sizeof(long long) << endl;
-  cout << sizeof(float) << endl;
-  cout << sizeof(double) << endl;
+  cout << "size of datatype" << endl;
+  cout << "short " << sizeof(short) << endl;
+  cout << "int " << sizeof(int) << endl; //still 4 bytes as 32bit machine
+  cout << "long " << sizeof(long) << endl;
+  cout << "long long " << sizeof(long long) << endl;
+  cout << "float " << sizeof(float) << endl;
+  cout << "double " << sizeof(double) << endl;
 
   string b;
-  cout << sizeof(&b) << ":" << sizeof(b) << endl;
+  cout << "address of string " << sizeof(&b) << endl
+       << "string " << sizeof(b) << endl;
 }
 
 void ds_bias_test()
@@ -60,10 +61,10 @@ void ds_bias_test()
   struc_t a;
   cout << static_cast<void *>(&(a.b)) << ":" << static_cast<void *>(&a) << endl;
   size_t bias = (char *)&(a.b) - (char *)(&a);
-  cout << bias << endl;
+  cout << "bias " << bias << endl;
 
   bias = (size_t) & (((struc_t *)0)->b);
-  cout << bias << endl;
+  cout << "bias "<< bias << endl;
 }
 
 void exception_test()
